@@ -32,17 +32,8 @@
   h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:0 0 10px;}
   .hint{color:var(--muted); font-size:.78rem; margin:8px 0 0;}
 
-  /* Cartes de box */
-  .box{
-    background:var(--panel); border:2px solid #2c2738; border-radius:14px;
-    padding:12px 14px; cursor:pointer; transition:border-color .1s;
-  }
-  .box.selected{border-color:var(--accent2);}
-  .boxHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
-  .boxName{font-weight:700;}
-  .boxKey{font-size:.72rem; color:var(--muted); letter-spacing:.05em;}
-  .box.selected .boxKey{color:var(--accent2);}
-  .grid{display:grid; gap:6px; margin-bottom:10px;}
+  /* Grille */
+  .grid{display:grid; gap:6px; margin-bottom:12px;}
   .grid.len8{grid-template-columns:repeat(8,1fr);}
   .grid.len16{grid-template-columns:repeat(16,1fr); gap:4px;}
   .step{
@@ -50,53 +41,62 @@
     background:var(--panel2); position:relative; transition:transform .05s, border-color .08s;
   }
   .grid.len16 .step{border-radius:5px; border-width:1px;}
-  .step.on{background:var(--accent); border-color:var(--accent);}
-  .step.ghost{background:#463d5c; border-color:#463d5c;}
+  .step.ghost{background:#3d3650; border-color:#3d3650;}
   .step.beat::after{
     content:""; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
     width:3px; height:3px; border-radius:50%; background:#4a4360;
   }
-  .step.playhead{border-color:var(--accent2); box-shadow:0 0 9px 1px rgba(93,214,255,.55);}
-  .step.hitflash{transform:scale(1.15); border-color:#fff;}
+  .step.playhead{border-color:#fff; box-shadow:0 0 9px 1px rgba(93,214,255,.55);}
+  .step.hitflash{transform:scale(1.15);}
+
   .seqSelect{
-    width:100%; margin-bottom:10px; padding:7px 10px; border-radius:8px;
+    width:100%; margin-bottom:12px; padding:7px 10px; border-radius:8px;
     background:var(--panel2); color:var(--ink); border:1px solid #3a3448; font-size:.85rem;
   }
-  .boxRow{display:flex; gap:8px; align-items:stretch;}
-  .tapBtn{
-    flex:2; padding:16px 0; font-size:1rem; font-weight:700; letter-spacing:.1em;
+
+  /* Pads de cubes : 1 cube = 1 son = 1 couleur */
+  .padRow{display:flex; gap:8px;}
+  .cubePad{
+    flex:1; padding:20px 4px 14px; font-size:1.4rem; font-weight:700;
     color:var(--ink); background:linear-gradient(160deg,#332b45,#241f31);
-    border:2px solid #4a4360; border-radius:10px; cursor:pointer; user-select:none;
+    border:3px solid; border-radius:12px; cursor:pointer; user-select:none;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
   }
-  .tapBtn:active{transform:scale(.98); border-color:var(--accent);}
-  .bindBtn{
-    flex:1; padding:8px; font-size:.78rem; font-weight:600; border-radius:10px;
+  .cubePad small{font-size:.62rem; color:var(--muted); letter-spacing:.05em; font-weight:600;}
+  .cubePad:active{transform:scale(.96);}
+
+  .metaRow{display:flex; align-items:center; gap:10px; margin-top:12px; font-size:.78rem; color:var(--muted);}
+  .bar{flex:1; height:7px; background:var(--panel2); border-radius:4px; overflow:hidden;}
+  #accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
+  #accPct{min-width:3.2ch; text-align:right; font-variant-numeric:tabular-nums;}
+  #combo{min-width:5ch; font-variant-numeric:tabular-nums; color:var(--accent2); font-weight:700;}
+  #fb{min-width:8ch; font-weight:800; font-size:.85rem; letter-spacing:.08em; text-align:center;}
+  #fb.PARFAIT{color:var(--good);} #fb.BIEN{color:var(--accent2);}
+  #fb.OK{color:var(--ok);} #fb.CLICK{color:var(--muted); font-weight:600;}
+
+  .loopRow{display:flex; gap:8px; align-items:center; margin-top:12px;}
+  #bindBtn{
+    padding:9px 16px; font-size:.82rem; font-weight:600; border-radius:10px;
     border:2px solid var(--accent); background:transparent; color:var(--ink); cursor:pointer;
   }
-  .bindBtn:hover:not(:disabled){background:rgba(255,93,162,.12);}
-  .bindBtn:disabled{opacity:.3; cursor:default;}
-  .boxMeta{display:flex; align-items:center; gap:10px; margin-top:10px; font-size:.78rem; color:var(--muted);}
-  .bar{flex:1; height:7px; background:var(--panel2); border-radius:4px; overflow:hidden;}
-  .accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
-  .accPct{min-width:3.2ch; text-align:right; font-variant-numeric:tabular-nums;}
-  .combo{min-width:6ch; font-variant-numeric:tabular-nums; color:var(--accent2); font-weight:700;}
-  .fb{min-width:7ch; font-weight:800; font-size:.85rem; letter-spacing:.08em; text-align:center;}
-  .fb.PARFAIT{color:var(--good);} .fb.BIEN{color:var(--accent2);}
-  .fb.OK{color:var(--ok);} .fb.CLICK{color:var(--muted); font-weight:600;}
-  .boxStatus{margin-top:8px; font-size:.82rem; color:var(--muted);}
-  .boxStatus.active{color:var(--ink);}
+  #bindBtn:hover:not(:disabled){background:rgba(255,93,162,.12);}
+  #bindBtn:disabled{opacity:.3; cursor:default;}
+  #looperStatus{font-size:.82rem; color:var(--muted); flex:1;}
+  #looperStatus.active{color:var(--ink);}
 
   /* Boutique / réglages */
   .shopBtn{
     width:100%; padding:11px 14px; margin-bottom:8px; font-size:.88rem; font-weight:600;
     border-radius:10px; border:2px solid var(--gold); background:transparent; color:var(--ink);
-    cursor:pointer; text-align:left; display:flex; justify-content:space-between; gap:10px;
+    cursor:pointer; text-align:left; display:flex; justify-content:space-between; gap:10px; align-items:center;
   }
   .shopBtn:hover:not(:disabled){background:rgba(255,209,102,.08);}
   .shopBtn:disabled{opacity:.35; cursor:default;}
   .shopBtn .price{color:var(--gold); white-space:nowrap;}
   .shopBtn.loopBuy{border-color:var(--accent);}
   .shopBtn.loopBuy .price{color:var(--accent);}
+  .shopBtn.cubeBuy{border-width:3px;}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:2px; vertical-align:baseline;}
   .toggleRow{display:flex; align-items:center; gap:10px; padding:6px 0; font-size:.9rem;}
   .toggleRow input{width:18px; height:18px; accent-color:var(--accent);}
   #resetBtn{border-color:var(--bad); color:var(--muted); font-weight:400; margin-top:8px;}
@@ -118,16 +118,16 @@
 
 <div id="overlay">
   <h1>🍬 Sugar Box</h1>
-  <p>Clique autant que tu veux : chaque clic rapporte au moins 1 🍬. Mais <b>frapper en rythme</b>
-  (touches 1-4, espace, ou les pads) rapporte beaucoup plus, et enchaîner les frappes précises monte
-  un <b>combo jusqu'à ×4</b>. Les rythmes déjà achetés rapportent toujours, même sans être activés
-  (cases fantômes). <b>Bind</b> un rythme en looper (achat requis par rythme) pour du revenu passif —
-  et continue de cliquer par-dessus.</p>
+  <p>Chaque <b>Sugar Cube</b> = 1 son = 1 couleur = 1 pad de frappe (touches 1-4).
+  Les pas de la grille prennent la couleur du cube à frapper : frappe le <b>bon cube au bon
+  moment</b> pour scorer et monter le combo (jusqu'à ×4). Tout clic rapporte au moins 1 🍬,
+  mais un clic raté (ou le mauvais cube) casse le combo. Achète de nouveaux cubes pour débloquer
+  des rythmes multi-couleurs plus riches — et binde-les en looper pour du revenu passif.</p>
   <button id="startBtn">▶ Démarrer</button>
 </div>
 
 <header>
-  <h1>Sugar Box <span class="tag">PROTO v0.3</span></h1>
+  <h1>Sugar Box <span class="tag">PROTO v0.4</span></h1>
   <div class="stats">
     <span>🍬 <b id="cash">0</b></span>
     <span class="passive">+<span id="passive">0</span>/s</span>
@@ -136,14 +136,25 @@
 </header>
 
 <main>
-  <div id="boxes"></div>
+  <section>
+    <div id="grid" class="grid len8"></div>
+    <select id="seqSelect" class="seqSelect"></select>
+    <div id="padRow" class="padRow"></div>
+    <div class="metaRow">
+      <span id="fb"></span><span id="combo"></span> Précision
+      <div class="bar"><div id="accBar"></div></div> <span id="accPct">–</span>
+    </div>
+    <div class="loopRow">
+      <button id="bindBtn" disabled>⟳ Bind</button>
+      <div id="looperStatus">Looper vide.</div>
+    </div>
+  </section>
 
   <section>
     <h2>Boutique</h2>
     <div id="shop"></div>
-    <p class="hint">Acheter un rythme le rend actif par défaut sur la box sélectionnée — les anciens
-    rapportent toujours (cases fantômes). L'achat <b>Loop</b> d'un rythme permet de le bind en looper.
-    Le passif = qualité du bind × frappes du rythme × BPM.</p>
+    <p class="hint">Un cube = 1 son = 1 couleur. Les rythmes multi-couleurs n'apparaissent que si
+    tu possèdes les cubes requis. L'achat <b>Loop</b> d'un rythme permet de le bind en looper.</p>
   </section>
 
   <section>
@@ -155,9 +166,9 @@
 </main>
 
 <footer>
-  Boucle : clic libre (+1) ou frappe en rythme (précision × combo, bien plus rentable que le spam) →
-  sucres → achats (rythmes, loops, box, grille, BPM, drone) → bind en looper (qualité gelée, on peut
-  cliquer par-dessus) → re-bind quand tu veux pour améliorer. Sauvegarde automatique locale.
+  Boucle : clic libre (+1) ou frappe du bon cube en rythme (précision × combo) → sucres → achats
+  (cubes, rythmes, loops, grille, BPM, drone) → bind en looper (on peut cliquer par-dessus) →
+  re-bind pour améliorer. Sauvegarde automatique locale.
 </footer>
 
 <script>
@@ -165,31 +176,33 @@
 
 // ---------- Définitions ----------
 const HIT_BASE = 5;
-const CLICK_MIN = 1;               // tout clic rapporte au moins ça
+const CLICK_MIN = 1;
 const LOOPER_RATIO = 0.6;
 const BPM_START = 60, BPM_MAX = 180;
 const BIND_MIN_HITS = 8;
 const DRONE_MULT = 1.25;
-const COMBO_STEP = 0.5, COMBO_CAP = 6; // multiplicateur : 1 → ×4 en 7 frappes précises
-const SAVE_KEY = 'sugarbox-save-v3';
+const COMBO_STEP = 0.5, COMBO_CAP = 6;
+const SAVE_KEY = 'sugarbox-save-v4';
 
-const BOX_DEFS = [
-  { sound: 'clap', icon: '👏', name: 'Box Clap', cost: 0 },
-  { sound: 'pok',  icon: '🪵', name: 'Box Pok',  cost: 500 },
-  { sound: 'kick', icon: '🥁', name: 'Box Kick', cost: 2500 },
-  { sound: 'hat',  icon: '🎩', name: 'Box Tsss', cost: 10000 },
+// 1 cube = 1 son = 1 couleur = 1 pad
+const CUBES = [
+  { id: 'clap', icon: '👏', name: 'Cube Clap', color: '#ff5da2', cost: 0 },
+  { id: 'kick', icon: '🥁', name: 'Cube Kick', color: '#ffd166', cost: 500 },
+  { id: 'pok',  icon: '🪵', name: 'Cube Pok',  color: '#5dd6ff', cost: 2000 },
+  { id: 'hat',  icon: '🎩', name: 'Cube Tsss', color: '#7bd88f', cost: 5000 },
 ];
 
-// Résolution : 1 pas = 1 croche. Noires = pas pairs, croches = tous les pas.
-// cost = jouer le rythme ; loopCost = droit de le bind en looper.
+// hits : [{s: pas, c: index de cube}] — needsCubes : cubes requis au-delà du clap
 const SEQUENCES = [
-  { id: 'pouls',    name: 'Pouls — 2 noires',            len: 8,  steps: [0, 4],                      cost: 0,    loopCost: 0 },
-  { id: 'noires',   name: 'Quatre noires',               len: 8,  steps: [0, 2, 4, 6],                cost: 100,  loopCost: 150 },
-  { id: 'syncope',  name: 'Syncope — noires + croche',   len: 8,  steps: [0, 3, 6],                   cost: 250,  loopCost: 300 },
-  { id: 'offbeat',  name: 'Croches off-beat',            len: 8,  steps: [1, 3, 5, 7],                cost: 400,  loopCost: 450 },
-  { id: 'roulis',   name: 'Roulis — noires + croches',   len: 8,  steps: [0, 2, 3, 4, 6, 7],          cost: 600,  loopCost: 700 },
-  { id: 'marche16', name: 'Longue marche — 2 mesures',   len: 16, steps: [0, 4, 8, 12, 14],           cost: 800,  loopCost: 900,  needsGrid16: true },
-  { id: 'groove16', name: 'Groove complet — 2 mesures',  len: 16, steps: [0, 3, 4, 7, 8, 10, 12, 14], cost: 1500, loopCost: 1600, needsGrid16: true },
+  { id: 'pouls',    name: 'Pouls — 2 noires',                 len: 8,  hits: [{s:0,c:0},{s:4,c:0}], cost: 0, loopCost: 0 },
+  { id: 'noires',   name: 'Quatre noires',                    len: 8,  hits: [{s:0,c:0},{s:2,c:0},{s:4,c:0},{s:6,c:0}], cost: 100, loopCost: 150 },
+  { id: 'syncope',  name: 'Syncope — noires + croche',        len: 8,  hits: [{s:0,c:0},{s:3,c:0},{s:6,c:0}], cost: 250, loopCost: 300 },
+  { id: 'offbeat',  name: 'Croches off-beat',                 len: 8,  hits: [{s:1,c:0},{s:3,c:0},{s:5,c:0},{s:7,c:0}], cost: 350, loopCost: 400 },
+  { id: 'kickclap', name: 'Kick & clap — 2 couleurs',         len: 8,  hits: [{s:0,c:1},{s:2,c:0},{s:4,c:1},{s:6,c:0}], cost: 400, loopCost: 450, needsCubes: [1] },
+  { id: 'grooveduo',name: 'Groove trio — 3 couleurs',         len: 8,  hits: [{s:0,c:1},{s:2,c:0},{s:3,c:2},{s:4,c:1},{s:6,c:0},{s:7,c:2}], cost: 800, loopCost: 900, needsCubes: [1, 2] },
+  { id: 'batterie', name: 'Batterie — kick, clap & charley',  len: 8,  hits: [{s:0,c:1},{s:1,c:3},{s:2,c:0},{s:3,c:3},{s:4,c:1},{s:5,c:3},{s:6,c:0},{s:7,c:3}], cost: 1500, loopCost: 1700, needsCubes: [1, 3] },
+  { id: 'marche16', name: 'Longue marche — 2 mesures',        len: 16, hits: [{s:0,c:1},{s:4,c:1},{s:8,c:1},{s:12,c:1},{s:14,c:0}], cost: 800, loopCost: 900, needsCubes: [1], needsGrid16: true },
+  { id: 'groove16', name: 'Groove complet — 2 mesures',       len: 16, hits: [{s:0,c:1},{s:3,c:2},{s:4,c:1},{s:7,c:2},{s:8,c:1},{s:10,c:0},{s:12,c:1},{s:14,c:0}], cost: 2000, loopCost: 2200, needsCubes: [1, 2], needsGrid16: true },
 ];
 const seqById = id => SEQUENCES.find(s => s.id === id);
 
@@ -198,21 +211,21 @@ let state = defaultState();
 function defaultState() {
   return {
     cash: 0, bpm: BPM_START, bpmCost: 200,
-    ownedBoxCount: 1,
+    ownedCubes: [0],
     ownedSeqs: ['pouls'],
     loopRights: ['pouls'],
+    seqId: 'pouls',
+    looper: null,               // {quality, seqId}
     grid16: false, droneOwned: false, droneOn: false, metronome: true,
-    boxes: [newBox()],
   };
 }
-function newBox() { return { seqId: 'pouls', looper: null }; } // looper = {quality, seqId}
 
-// Volatile (non sauvegardé)
+// Volatile
 let audio = null, noiseBuf = null, droneGraph = null;
-let nextStepTime = 0, absStep = 0;
-let selected = 0;
+let nextStepTime = 0, absStep = 0, playhead = -1;
 const drawQueue = [];
-let runtime = []; // par box : {stepTimes:[], scores:[], combo:0, playhead:-1}
+let stepTimes = [];             // {time, c, taken}
+let scores = [], combo = 0;
 
 const LOOKAHEAD_MS = 25, SCHEDULE_AHEAD = 0.2;
 
@@ -225,7 +238,7 @@ function load() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
-    if (s && Array.isArray(s.boxes) && s.boxes.length) state = Object.assign(defaultState(), s);
+    if (s && Array.isArray(s.ownedCubes)) state = Object.assign(defaultState(), s);
   } catch (e) {}
 }
 setInterval(save, 3000);
@@ -239,7 +252,8 @@ function initAudio() {
   for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
 }
 
-function playSound(kind, t, gain) {
+function playCube(c, t, gain) {
+  const kind = CUBES[c].id;
   if (kind === 'clap') {
     for (let i = 0; i < 3; i++) {
       const t0 = t + i * 0.012, last = i === 2;
@@ -305,24 +319,25 @@ function stopDrone() {
 
 // ---------- Économie ----------
 const droneMult = () => (state.droneOwned && state.droneOn) ? DRONE_MULT : 1;
-const looperHitVal = b => HIT_BASE * LOOPER_RATIO * b.looper.quality * droneMult();
+const looperHitVal = () => HIT_BASE * LOOPER_RATIO * state.looper.quality * droneMult();
 function passivePerSec() {
-  let total = 0;
-  state.boxes.forEach(b => {
-    if (!b.looper) return;
-    const seq = seqById(b.looper.seqId);
-    // chaque pas actif sonne une fois par cycle ; cycle = len × durée d'un pas
-    total += looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
-  });
-  return total;
+  if (!state.looper) return 0;
+  const seq = seqById(state.looper.seqId);
+  return looperHitVal() * seq.hits.length / (seq.len * stepDur());
 }
 
-// Union des rythmes possédés : un pas "scorable" à cette position absolue ?
-function unionActive(abs) {
+// Un rythme est jouable si ses cubes sont possédés et la grille suffit
+function seqPlayable(seq) {
+  if (seq.needsGrid16 && !state.grid16) return false;
+  return (seq.needsCubes || []).every(c => state.ownedCubes.includes(c));
+}
+
+// Union des rythmes possédés jouables : le cube c est-il scorable à cette position ?
+function unionCubeActive(abs, c) {
   return state.ownedSeqs.some(id => {
     const seq = seqById(id);
-    if (seq.needsGrid16 && !state.grid16) return false;
-    return seq.steps.includes(abs % seq.len);
+    if (!seqPlayable(seq)) return false;
+    return seq.hits.some(h => h.c === c && h.s === abs % seq.len);
   });
 }
 
@@ -336,24 +351,23 @@ function scheduler() {
     absStep++;
   }
   const cutoff = audio.currentTime - 0.5;
-  runtime.forEach(r => {
-    while (r.stepTimes.length && r.stepTimes[0].time < cutoff) r.stepTimes.shift();
-  });
+  while (stepTimes.length && stepTimes[0].time < cutoff) stepTimes.shift();
 }
 
 function scheduleStep(abs, t) {
   if (state.metronome && abs % 2 === 0) tick(t, abs % 8 === 0);
-  const scorable = unionActive(abs);
-  state.boxes.forEach((b, i) => {
-    if (scorable) runtime[i].stepTimes.push({ time: t, taken: false });
-    if (b.looper) {
-      const seq = seqById(b.looper.seqId);
-      if (seq.steps.includes(abs % seq.len)) {
-        playSound(BOX_DEFS[i].sound, t, 0.45);
-        state.cash += looperHitVal(b);
-      }
-    }
+  state.ownedCubes.forEach(c => {
+    if (unionCubeActive(abs, c)) stepTimes.push({ time: t, c, taken: false });
   });
+  if (state.looper) {
+    const seq = seqById(state.looper.seqId);
+    seq.hits.forEach(h => {
+      if (h.s === abs % seq.len) {
+        playCube(h.c, t, 0.45);
+        state.cash += looperHitVal();
+      }
+    });
+  }
   drawQueue.push({ time: t, abs });
 }
 
@@ -363,18 +377,16 @@ const WINDOWS = [
   { d: 0.090, score: 0.7, mult: 2, label: 'BIEN',    combo: 'up' },
   { d: 0.160, score: 0.4, mult: 1, label: 'OK',      combo: 'keep' },
 ];
+const comboMult = () => 1 + Math.min(combo, COMBO_CAP) * COMBO_STEP;
 
-function comboMult(r) { return 1 + Math.min(r.combo, COMBO_CAP) * COMBO_STEP; }
-
-function tap(i) {
-  if (!audio || i >= state.boxes.length) return;
-  selectBox(i);
-  const b = state.boxes[i], r = runtime[i];
+function tap(c) {
+  if (!audio || !state.ownedCubes.includes(c)) return;
   const t = audio.currentTime;
 
+  // pas scorables de CE cube uniquement : le mauvais cube ne matche pas
   let best = null, bestD = Infinity;
-  for (const s of r.stepTimes) {
-    if (s.taken) continue;
+  for (const s of stepTimes) {
+    if (s.taken || s.c !== c) continue;
     const d = Math.abs(t - s.time);
     if (d < bestD) { bestD = d; best = s; }
   }
@@ -383,179 +395,137 @@ function tap(i) {
 
   if (win) {
     best.taken = true;
-    playSound(BOX_DEFS[i].sound, t, 1);
-    flashPlayhead(i);
-    const gain = HIT_BASE * win.mult * comboMult(r) * (state.bpm / BPM_START) * droneMult();
+    playCube(c, t, 1);
+    flashPlayhead();
+    const gain = HIT_BASE * win.mult * comboMult() * (state.bpm / BPM_START) * droneMult();
     state.cash += gain;
-    if (win.combo === 'up') r.combo++;
-    pushScore(r, win.score);
-    showFb(i, win.label, `${win.label} +${Math.round(gain)}`);
+    if (win.combo === 'up') combo++;
+    pushScore(win.score);
+    showFb(win.label, `${win.label} +${Math.round(gain)}`);
   } else {
-    // clic hors rythme : ça reste un clicker — minimum garanti, mais le combo tombe
-    playSound(BOX_DEFS[i].sound, t, 0.25);
+    // clic libre / mauvais cube : minimum garanti, combo cassé
+    playCube(c, t, 0.25);
     state.cash += CLICK_MIN;
-    r.combo = 0;
-    pushScore(r, 0);
-    showFb(i, 'CLICK', '+' + CLICK_MIN);
+    combo = 0;
+    pushScore(0);
+    showFb('CLICK', '+' + CLICK_MIN);
   }
-  updateBoxStatus(i);
+  updateLooperUI();
 }
 
-function pushScore(r, s) {
-  r.scores.push(s);
-  if (r.scores.length > BIND_MIN_HITS) r.scores.shift();
+function pushScore(s) {
+  scores.push(s);
+  if (scores.length > BIND_MIN_HITS) scores.shift();
 }
-const accuracy = r => r.scores.length ? r.scores.reduce((a, b) => a + b, 0) / r.scores.length : 0;
+const accuracy = () => scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
 
-function bind(i) {
-  const b = state.boxes[i], r = runtime[i];
-  if (r.scores.length < BIND_MIN_HITS || !state.loopRights.includes(b.seqId)) return;
-  b.looper = { quality: accuracy(r), seqId: b.seqId };
-  updateBoxStatus(i);
+function bind() {
+  if (scores.length < BIND_MIN_HITS || !state.loopRights.includes(state.seqId)) return;
+  state.looper = { quality: accuracy(), seqId: state.seqId };
+  updateLooperUI();
   save();
 }
 
-// ---------- UI : boxes ----------
-const boxesEl = document.getElementById('boxes');
-let boxUI = [];
+// ---------- UI ----------
+const $ = id => document.getElementById(id);
+const gridEl = $('grid'), padRowEl = $('padRow'), seqSelEl = $('seqSelect'),
+      shopEl = $('shop'), fbEl = $('fb'), comboEl = $('combo'),
+      bindBtn = $('bindBtn'), looperStatusEl = $('looperStatus');
+let cells = [];
 
-function renderBoxes() {
-  boxesEl.innerHTML = '';
-  boxUI = [];
-  state.boxes.forEach((b, i) => {
-    const def = BOX_DEFS[i];
-    const seq = seqById(b.seqId);
-    const card = document.createElement('section');
-    card.className = 'box' + (i === selected ? ' selected' : '');
-    card.addEventListener('pointerdown', () => selectBox(i));
-
-    const head = document.createElement('div');
-    head.className = 'boxHead';
-    head.innerHTML = `<span class="boxName">${def.icon} ${def.name}</span><span class="boxKey">touche [${i + 1}]${i === selected ? ' · espace' : ''}</span>`;
-    card.appendChild(head);
-
-    // Grille : rythme actif en plein, pas des autres rythmes possédés en fantôme
-    const gridLen = state.grid16 ? 16 : 8;
-    const grid = document.createElement('div');
-    grid.className = 'grid len' + gridLen;
-    const cells = [];
-    for (let s = 0; s < gridLen; s++) {
-      const cell = document.createElement('div');
-      let cls = 'step';
-      if (seq.steps.includes(s % seq.len)) cls += ' on';
-      else if (unionActive(s)) cls += ' ghost';
-      if (s % 2 === 0) cls += ' beat';
-      cell.className = cls;
-      grid.appendChild(cell); cells.push(cell);
+function renderGrid() {
+  const seq = seqById(state.seqId);
+  const gridLen = state.grid16 ? 16 : 8;
+  gridEl.className = 'grid len' + gridLen;
+  gridEl.innerHTML = '';
+  cells = [];
+  for (let s = 0; s < gridLen; s++) {
+    const cell = document.createElement('div');
+    let cls = 'step';
+    const hit = seq.hits.find(h => h.s === s % seq.len);
+    if (!hit) {
+      // pas d'un autre rythme possédé → fantôme
+      if (state.ownedCubes.some(c => unionCubeActive(s, c))) cls += ' ghost';
     }
-    card.appendChild(grid);
+    if (s % 2 === 0) cls += ' beat';
+    cell.className = cls;
+    if (hit) {
+      cell.style.background = CUBES[hit.c].color;
+      cell.style.borderColor = CUBES[hit.c].color;
+    }
+    gridEl.appendChild(cell); cells.push(cell);
+  }
+}
 
-    const sel = document.createElement('select');
-    sel.className = 'seqSelect';
-    SEQUENCES.filter(sq => state.ownedSeqs.includes(sq.id))
-      .filter(sq => !sq.needsGrid16 || state.grid16)
-      .forEach(sq => {
-        const opt = document.createElement('option');
-        opt.value = sq.id;
-        const loopTag = state.loopRights.includes(sq.id) ? '' : ' — loop non acheté';
-        opt.textContent = `${sq.name} (${sq.steps.length} frappes)${loopTag}`;
-        if (sq.id === b.seqId) opt.selected = true;
-        sel.appendChild(opt);
-      });
-    sel.addEventListener('change', () => {
-      b.seqId = sel.value;   // le looper en cours continue sur son propre rythme
-      save(); renderBoxes();
-    });
-    sel.addEventListener('pointerdown', e => e.stopPropagation());
-    card.appendChild(sel);
-
-    const row = document.createElement('div');
-    row.className = 'boxRow';
-    const tapBtn = document.createElement('button');
-    tapBtn.className = 'tapBtn'; tapBtn.textContent = 'FRAPPE';
-    tapBtn.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); tap(i); });
-    const bindBtn = document.createElement('button');
-    bindBtn.className = 'bindBtn'; bindBtn.textContent = '⟳ Bind';
-    bindBtn.disabled = true;
-    bindBtn.addEventListener('pointerdown', e => e.stopPropagation());
-    bindBtn.addEventListener('click', () => bind(i));
-    row.appendChild(tapBtn); row.appendChild(bindBtn);
-    card.appendChild(row);
-
-    const meta = document.createElement('div');
-    meta.className = 'boxMeta';
-    meta.innerHTML = `<span class="fb"></span><span class="combo"></span> Précision <div class="bar"><div class="accBar"></div></div> <span class="accPct">–</span>`;
-    card.appendChild(meta);
-
-    const status = document.createElement('div');
-    status.className = 'boxStatus';
-    card.appendChild(status);
-
-    boxesEl.appendChild(card);
-    boxUI.push({
-      cells, cardEl: card, bindBtn,
-      fbEl: meta.querySelector('.fb'),
-      comboEl: meta.querySelector('.combo'),
-      accBarEl: meta.querySelector('.accBar'),
-      accPctEl: meta.querySelector('.accPct'),
-      statusEl: status,
-    });
-    updateBoxStatus(i);
+function renderPads() {
+  padRowEl.innerHTML = '';
+  state.ownedCubes.forEach(c => {
+    const cube = CUBES[c];
+    const pad = document.createElement('button');
+    pad.className = 'cubePad';
+    pad.style.borderColor = cube.color;
+    pad.innerHTML = `${cube.icon}<small>[${c + 1}]</small>`;
+    pad.addEventListener('pointerdown', e => { e.preventDefault(); tap(c); });
+    padRowEl.appendChild(pad);
   });
 }
 
-function selectBox(i) {
-  if (i === selected) return;
-  selected = i;
-  boxUI.forEach((u, j) => {
-    u.cardEl.classList.toggle('selected', j === i);
-    u.cardEl.querySelector('.boxKey').textContent = `touche [${j + 1}]` + (j === i ? ' · espace' : '');
-  });
+function renderSeqSelect() {
+  seqSelEl.innerHTML = '';
+  SEQUENCES.filter(sq => state.ownedSeqs.includes(sq.id) && seqPlayable(sq))
+    .forEach(sq => {
+      const opt = document.createElement('option');
+      opt.value = sq.id;
+      const nCubes = new Set(sq.hits.map(h => h.c)).size;
+      const loopTag = state.loopRights.includes(sq.id) ? '' : ' — loop non acheté';
+      opt.textContent = `${sq.name} (${sq.hits.length} frappes, ${nCubes} couleur${nCubes > 1 ? 's' : ''})${loopTag}`;
+      if (sq.id === state.seqId) opt.selected = true;
+      seqSelEl.appendChild(opt);
+    });
 }
+seqSelEl.addEventListener('change', () => {
+  state.seqId = seqSelEl.value;   // le looper en cours continue sur son propre rythme
+  save(); renderGrid(); renderSeqSelect(); updateLooperUI();
+});
 
-function updateBoxStatus(i) {
-  const b = state.boxes[i], r = runtime[i], u = boxUI[i];
-  if (!u) return;
-  u.statusEl.classList.remove('active');
+function updateLooperUI() {
   const parts = [];
-  if (b.looper) {
-    const seq = seqById(b.looper.seqId);
-    const rate = looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
-    u.statusEl.classList.add('active');
-    parts.push(`Looper : ${seq.name} — qualité <b>${Math.round(b.looper.quality * 100)}%</b> · +${rate.toFixed(1)} 🍬/s`);
+  looperStatusEl.classList.remove('active');
+  if (state.looper) {
+    const seq = seqById(state.looper.seqId);
+    looperStatusEl.classList.add('active');
+    parts.push(`Looper : ${seq.name} — qualité <b>${Math.round(state.looper.quality * 100)}%</b> · +${passivePerSec().toFixed(1)} 🍬/s.`);
   } else {
     parts.push('Looper vide.');
   }
-  if (!state.loopRights.includes(b.seqId)) {
-    parts.push(`Achète « Loop » pour bind ${seqById(b.seqId).name}.`);
-  } else if (r.scores.length < BIND_MIN_HITS) {
-    parts.push(`Encore ${BIND_MIN_HITS - r.scores.length} frappe(s) avant de pouvoir bind.`);
+  if (!state.loopRights.includes(state.seqId)) {
+    parts.push(`Achète « Loop » pour bind ${seqById(state.seqId).name}.`);
+  } else if (scores.length < BIND_MIN_HITS) {
+    parts.push(`Encore ${BIND_MIN_HITS - scores.length} frappe(s) avant de pouvoir bind.`);
   } else {
-    parts.push(`Bind possible à ${Math.round(accuracy(r) * 100)}%.`);
+    parts.push(`Bind possible à ${Math.round(accuracy() * 100)}%.`);
   }
-  u.statusEl.innerHTML = parts.join(' ');
-  u.bindBtn.disabled = r.scores.length < BIND_MIN_HITS || !state.loopRights.includes(b.seqId);
+  looperStatusEl.innerHTML = parts.join(' ');
+  bindBtn.disabled = scores.length < BIND_MIN_HITS || !state.loopRights.includes(state.seqId);
 }
+bindBtn.addEventListener('click', bind);
 
-let fbTimers = {};
-function showFb(i, cls, txt) {
-  const u = boxUI[i]; if (!u) return;
-  u.fbEl.textContent = txt || cls;
-  u.fbEl.className = 'fb ' + cls;
-  clearTimeout(fbTimers[i]);
-  fbTimers[i] = setTimeout(() => { u.fbEl.textContent = ''; }, 700);
+let fbTimer = null;
+function showFb(cls, txt) {
+  fbEl.textContent = txt || cls;
+  fbEl.className = cls;
+  fbEl.id = 'fb';
+  clearTimeout(fbTimer);
+  fbTimer = setTimeout(() => { fbEl.textContent = ''; }, 700);
 }
-function flashPlayhead(i) {
-  const u = boxUI[i];
-  const cell = u.cells.find(c => c.classList.contains('playhead'));
+function flashPlayhead() {
+  const cell = cells.find(c => c.classList.contains('playhead'));
   if (!cell) return;
   cell.classList.add('hitflash');
   setTimeout(() => cell.classList.remove('hitflash'), 120);
 }
 
-// ---------- UI : boutique ----------
-const shopEl = document.getElementById('shop');
-
+// ---------- Boutique ----------
 function renderShop() {
   shopEl.innerHTML = '';
   const add = (label, cost, onBuy, cls) => {
@@ -566,29 +536,31 @@ function renderShop() {
     btn.addEventListener('click', () => {
       if (state.cash < cost) return;
       state.cash -= cost;
-      onBuy(); save(); renderShop(); renderBoxes();
+      onBuy(); save();
+      renderShop(); renderGrid(); renderPads(); renderSeqSelect(); updateLooperUI();
     });
     shopEl.appendChild(btn);
   };
+  const dot = c => `<span class="dot" style="background:${CUBES[c].color}"></span>`;
 
-  if (state.ownedBoxCount < BOX_DEFS.length) {
-    const def = BOX_DEFS[state.ownedBoxCount];
-    add(`Nouvelle Sugar Box : ${def.icon} ${def.name} — nouveau son`, def.cost, () => {
-      state.ownedBoxCount++;
-      state.boxes.push(newBox());
-      runtime.push({ stepTimes: [], scores: [], combo: 0, playhead: -1 });
+  // Cubes : 1 son = 1 couleur = 1 pad de plus
+  CUBES.forEach((cube, c) => {
+    if (state.ownedCubes.includes(c)) return;
+    const btn = `Sugar Cube : ${dot(c)} ${cube.icon} ${cube.name} — nouveau son + pad`;
+    add(btn, cube.cost, () => { state.ownedCubes.push(c); state.ownedCubes.sort(); }, 'cubeBuy');
+  });
+
+  // Rythmes (visibles seulement si les cubes requis sont possédés)
+  SEQUENCES.filter(sq => !state.ownedSeqs.includes(sq.id) && seqPlayable(sq))
+    .forEach(sq => {
+      const colors = [...new Set(sq.hits.map(h => h.c))].map(dot).join('');
+      add(`Rythme : ${colors} ${sq.name}`, sq.cost, () => {
+        state.ownedSeqs.push(sq.id);
+        state.seqId = sq.id;      // devient le rythme par défaut
+      });
     });
-  }
 
-  // Rythmes à jouer (le nouvel achat devient le rythme par défaut de la box sélectionnée)
-  SEQUENCES.filter(sq => !state.ownedSeqs.includes(sq.id))
-    .filter(sq => !sq.needsGrid16 || state.grid16)
-    .forEach(sq => add(`Rythme : ${sq.name}`, sq.cost, () => {
-      state.ownedSeqs.push(sq.id);
-      state.boxes[selected].seqId = sq.id;
-    }));
-
-  // Droits de loop pour les rythmes possédés
+  // Droits de loop
   SEQUENCES.filter(sq => state.ownedSeqs.includes(sq.id) && !state.loopRights.includes(sq.id))
     .forEach(sq => add(`Loop : ${sq.name} — permet de le bind en looper`, sq.loopCost,
       () => state.loopRights.push(sq.id), 'loopBuy'));
@@ -600,8 +572,8 @@ function renderShop() {
   if (!state.droneOwned)
     add(`Nappe de fond (drone) — ambiance + revenus ×${DRONE_MULT}`, 800, () => {
       state.droneOwned = true; state.droneOn = true;
-      document.getElementById('droneRow').style.display = '';
-      document.getElementById('droneToggle').checked = true;
+      $('droneRow').style.display = '';
+      $('droneToggle').checked = true;
       startDrone();
     });
 
@@ -609,7 +581,7 @@ function renderShop() {
     add(`+10 BPM (${state.bpm} → ${state.bpm + 10}) — plus de débit, précision plus dure`, state.bpmCost, () => {
       state.bpm += 10;
       state.bpmCost = Math.round(state.bpmCost * 1.6);
-      document.getElementById('bpmLabel').textContent = state.bpm;
+      $('bpmLabel').textContent = state.bpm;
     });
 }
 
@@ -619,24 +591,19 @@ function draw() {
     const now = audio.currentTime;
     let last = null;
     while (drawQueue.length && drawQueue[0].time <= now) last = drawQueue.shift();
-    if (last !== null) {
-      boxUI.forEach((u, i) => {
-        const ph = last.abs % u.cells.length;
-        if (runtime[i].playhead !== ph) {
-          u.cells.forEach((c, s) => c.classList.toggle('playhead', s === ph));
-          runtime[i].playhead = ph;
-        }
-      });
+    if (last !== null && cells.length) {
+      const ph = last.abs % cells.length;
+      if (playhead !== ph) {
+        cells.forEach((c, s) => c.classList.toggle('playhead', s === ph));
+        playhead = ph;
+      }
     }
-    document.getElementById('cash').textContent = Math.floor(state.cash);
-    document.getElementById('passive').textContent = passivePerSec().toFixed(1);
-    boxUI.forEach((u, i) => {
-      const r = runtime[i];
-      const acc = accuracy(r);
-      u.accBarEl.style.width = (acc * 100) + '%';
-      u.accPctEl.textContent = r.scores.length ? Math.round(acc * 100) + '%' : '–';
-      u.comboEl.textContent = r.combo > 0 ? '×' + comboMult(r).toFixed(1) : '';
-    });
+    $('cash').textContent = Math.floor(state.cash);
+    $('passive').textContent = passivePerSec().toFixed(1);
+    const acc = accuracy();
+    $('accBar').style.width = (acc * 100) + '%';
+    $('accPct').textContent = scores.length ? Math.round(acc * 100) + '%' : '–';
+    comboEl.textContent = combo > 0 ? '×' + comboMult().toFixed(1) : '';
     shopEl.querySelectorAll('.shopBtn').forEach(btn => {
       btn.disabled = state.cash < Number(btn.dataset.cost);
     });
@@ -647,20 +614,20 @@ function draw() {
 // ---------- Entrées ----------
 document.addEventListener('keydown', e => {
   if (e.repeat) return;
-  if (e.code === 'Space') { e.preventDefault(); tap(selected); }
+  if (e.code === 'Space') { e.preventDefault(); tap(state.ownedCubes[0]); }
   const n = ['Digit1', 'Digit2', 'Digit3', 'Digit4'].indexOf(e.code);
-  if (n >= 0 && n < state.boxes.length) { e.preventDefault(); tap(n); }
+  if (n >= 0) { e.preventDefault(); tap(n); }
 });
 
-document.getElementById('metroToggle').addEventListener('change', e => {
+$('metroToggle').addEventListener('change', e => {
   state.metronome = e.target.checked; save();
 });
-document.getElementById('droneToggle').addEventListener('change', e => {
+$('droneToggle').addEventListener('change', e => {
   state.droneOn = e.target.checked;
   if (state.droneOn) startDrone(); else stopDrone();
   save();
 });
-document.getElementById('resetBtn').addEventListener('click', () => {
+$('resetBtn').addEventListener('click', () => {
   if (!confirm('Réinitialiser toute la partie ?')) return;
   localStorage.removeItem(SAVE_KEY);
   location.reload();
@@ -668,24 +635,22 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 // ---------- Démarrage ----------
 load();
-runtime = state.boxes.map(() => ({ stepTimes: [], scores: [], combo: 0, playhead: -1 }));
-document.getElementById('bpmLabel').textContent = state.bpm;
-document.getElementById('metroToggle').checked = state.metronome;
+$('bpmLabel').textContent = state.bpm;
+$('metroToggle').checked = state.metronome;
 if (state.droneOwned) {
-  document.getElementById('droneRow').style.display = '';
-  document.getElementById('droneToggle').checked = state.droneOn;
+  $('droneRow').style.display = '';
+  $('droneToggle').checked = state.droneOn;
 }
-renderBoxes();
-renderShop();
+renderGrid(); renderPads(); renderSeqSelect(); renderShop(); updateLooperUI();
 
-document.getElementById('startBtn').addEventListener('click', () => {
+$('startBtn').addEventListener('click', () => {
   initAudio();
   nextStepTime = audio.currentTime + 0.1;
   absStep = 0;
   if (state.droneOwned && state.droneOn) startDrone();
   setInterval(scheduler, LOOKAHEAD_MS);
   requestAnimationFrame(draw);
-  document.getElementById('overlay').remove();
+  $('overlay').remove();
 });
 </script>
 </body>
