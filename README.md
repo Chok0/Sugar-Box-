@@ -11,17 +11,18 @@ python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-## La boucle (v0.3)
+## La boucle (v0.4)
 
-1. **Cliquer rapporte toujours** : un clic hors rythme donne +1 🍬 (ça reste un clicker), mais il casse le combo.
-2. **Frapper en rythme** (touches 1-4, espace ou les pads) rapporte bien plus : `5 🍬 × précision (×1/×2/×3) × combo (jusqu'à ×4) × BPM`. Le combo monte sur les frappes PARFAIT/BIEN consécutives — c'est ce qui rend le jeu propre plus rentable que le spam.
-3. **Rythmes cumulatifs** : acheter un rythme le rend actif par défaut, mais tous les rythmes possédés continuent de rapporter si on les frappe (cases fantômes sur la grille), sans avoir à les activer.
-4. **Bind** : après 8 frappes, geler la qualité en looper — passif = `qualité_du_bind × frappes_du_rythme × BPM`. On peut cliquer par-dessus le looper sans le perdre ; re-bind remplace la qualité. Le droit de bind s'achète **par rythme** (achat « Loop », le rythme de départ l'inclut).
+1. **Un Sugar Cube = 1 son = 1 couleur = 1 pad de frappe** (touches 1-4). Les pas de la grille prennent la couleur du cube à frapper.
+2. **Cliquer rapporte toujours** : un clic hors rythme — ou le **mauvais cube** au bon moment — donne +1 🍬 (ça reste un clicker), mais casse le combo.
+3. **Frapper le bon cube en rythme** rapporte bien plus : `5 🍬 × précision (×1/×2/×3) × combo (jusqu'à ×4) × BPM`. Le combo monte sur les frappes PARFAIT/BIEN consécutives — c'est ce qui rend le jeu propre plus rentable que le spam.
+4. **Rythmes cumulatifs** : acheter un rythme le rend actif par défaut, mais tous les rythmes possédés continuent de rapporter si on les frappe (cases fantômes sur la grille), sans avoir à les activer.
+5. **Bind** : après 8 frappes, geler la qualité en looper — passif = `qualité_du_bind × frappes_du_rythme × BPM`. On peut cliquer par-dessus le looper sans le perdre ; re-bind remplace la qualité. Le droit de bind s'achète **par rythme** (achat « Loop », le rythme de départ l'inclut).
 
 ## Contenu achetable
 
-- **Sugar Box supplémentaires** (jusqu'à 4), chacune avec son propre son (clap, pok, kick, hi-hat), sa grille et son looper indépendant — jouer l'une pendant que les autres tournent
-- **Rythmes** de complexité croissante : noires seules → noires + croches → syncopes → off-beat → roulement
+- **Sugar Cubes** : 👏 Clap (inclus) → 🥁 Kick → 🪵 Pok → 🎩 Tsss (hi-hat). Chaque cube ajoute son pad coloré et **débloque les rythmes multi-couleurs** qui l'utilisent — c'est l'axe de complexification des séquences
+- **Rythmes** de complexité croissante : noires seules → syncopes → off-beat → kick & clap (2 couleurs) → groove trio (3 couleurs) → batterie avec charley
 - **Loops** : le droit de bind chaque rythme en looper (achat séparé par rythme)
 - **Extension de grille 16 pas** (2 mesures) qui débloque les rythmes longs
 - **Nappe de fond (drone)** : ambiance + revenus ×1.25, activable/désactivable
