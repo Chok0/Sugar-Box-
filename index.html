@@ -18,65 +18,87 @@
     display:flex; flex-direction:column; align-items:center; min-height:100vh;
   }
   header{
-    width:100%; max-width:640px; padding:16px 20px 8px;
+    width:100%; max-width:680px; padding:16px 20px 8px;
     display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;
+    position:sticky; top:0; background:var(--bg); z-index:5;
   }
   h1{font-size:1.3rem; margin:0;}
   h1 .tag{font-size:.7rem; color:var(--muted); font-weight:normal; letter-spacing:.08em;}
-  .stats{display:flex; gap:16px; font-variant-numeric:tabular-nums; font-size:.95rem;}
+  .stats{display:flex; gap:14px; font-variant-numeric:tabular-nums; font-size:.95rem;}
   .stats b{color:var(--gold);}
   .stats .passive{color:var(--accent2);}
-  main{width:100%; max-width:640px; padding:0 20px 40px; display:flex; flex-direction:column; gap:14px;}
+  main{width:100%; max-width:680px; padding:0 20px 40px; display:flex; flex-direction:column; gap:14px;}
   section{background:var(--panel); border-radius:14px; padding:14px 16px;}
   h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:0 0 10px;}
+  .hint{color:var(--muted); font-size:.78rem; margin:8px 0 0;}
 
-  /* Grille */
-  #grid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px;}
-  .step{
-    aspect-ratio:1; border-radius:10px; border:2px solid #3a3448;
-    background:var(--panel2); cursor:pointer; position:relative;
-    transition:background .08s, border-color .08s, transform .05s;
+  /* Cartes de box */
+  .box{
+    background:var(--panel); border:2px solid #2c2738; border-radius:14px;
+    padding:12px 14px; cursor:pointer; transition:border-color .1s;
   }
+  .box.selected{border-color:var(--accent2);}
+  .boxHead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .boxName{font-weight:700;}
+  .boxKey{font-size:.72rem; color:var(--muted); letter-spacing:.05em;}
+  .box.selected .boxKey{color:var(--accent2);}
+  .grid{display:grid; gap:6px; margin-bottom:10px;}
+  .grid.len8{grid-template-columns:repeat(8,1fr);}
+  .grid.len16{grid-template-columns:repeat(16,1fr); gap:4px;}
+  .step{
+    aspect-ratio:1; border-radius:7px; border:2px solid #3a3448;
+    background:var(--panel2); position:relative; transition:transform .05s, border-color .08s;
+  }
+  .grid.len16 .step{border-radius:5px; border-width:1px;}
   .step.on{background:var(--accent); border-color:var(--accent);}
   .step.beat::after{
-    content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
-    width:4px; height:4px; border-radius:50%; background:#4a4360;
+    content:""; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+    width:3px; height:3px; border-radius:50%; background:#4a4360;
   }
-  .step.playhead{border-color:var(--accent2); box-shadow:0 0 10px 1px rgba(93,214,255,.55);}
-  .step.hitflash{transform:scale(1.12); border-color:#fff;}
-  .hint{color:var(--muted); font-size:.8rem; margin:10px 0 0;}
-
-  /* Pad de frappe */
-  #pad{display:flex; flex-direction:column; align-items:center; gap:10px;}
-  #tapPad{
-    width:100%; padding:26px 0; font-size:1.25rem; font-weight:700; letter-spacing:.12em;
+  .step.playhead{border-color:var(--accent2); box-shadow:0 0 9px 1px rgba(93,214,255,.55);}
+  .step.hitflash{transform:scale(1.15); border-color:#fff;}
+  .seqSelect{
+    width:100%; margin-bottom:10px; padding:7px 10px; border-radius:8px;
+    background:var(--panel2); color:var(--ink); border:1px solid #3a3448; font-size:.85rem;
+  }
+  .boxRow{display:flex; gap:8px; align-items:stretch;}
+  .tapBtn{
+    flex:2; padding:16px 0; font-size:1rem; font-weight:700; letter-spacing:.1em;
     color:var(--ink); background:linear-gradient(160deg,#332b45,#241f31);
-    border:2px solid #4a4360; border-radius:14px; cursor:pointer; user-select:none;
+    border:2px solid #4a4360; border-radius:10px; cursor:pointer; user-select:none;
   }
-  #tapPad:active{transform:scale(.985); border-color:var(--accent);}
-  #tapPad small{display:block; font-size:.65rem; color:var(--muted); letter-spacing:.05em; margin-top:4px;}
-  #feedback{height:1.6em; font-size:1.15rem; font-weight:800; letter-spacing:.1em;}
-  #feedback.PARFAIT{color:var(--good);} #feedback.BIEN{color:var(--accent2);}
-  #feedback.OK{color:var(--ok);} #feedback.RATÉ{color:var(--bad);}
-  .gauge{width:100%; display:flex; align-items:center; gap:10px; font-size:.8rem; color:var(--muted);}
-  .bar{flex:1; height:8px; background:var(--panel2); border-radius:4px; overflow:hidden;}
-  #accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
-  #accPct{min-width:3ch; text-align:right; font-variant-numeric:tabular-nums;}
-
-  /* Looper & boutique */
-  #looperStatus{font-size:.9rem; color:var(--muted); margin-bottom:10px;}
-  #looperStatus.active{color:var(--ink);}
-  button.action{
-    width:100%; padding:12px; font-size:.95rem; font-weight:600; border-radius:10px;
+  .tapBtn:active{transform:scale(.98); border-color:var(--accent);}
+  .bindBtn{
+    flex:1; padding:8px; font-size:.78rem; font-weight:600; border-radius:10px;
     border:2px solid var(--accent); background:transparent; color:var(--ink); cursor:pointer;
   }
-  button.action:hover:not(:disabled){background:rgba(255,93,162,.12);}
-  button.action:disabled{opacity:.35; cursor:default;}
-  #buyBpm{border-color:var(--gold);}
-  #buyBpm:hover:not(:disabled){background:rgba(255,209,102,.1);}
-  footer{max-width:640px; padding:0 20px 30px; color:var(--muted); font-size:.75rem; line-height:1.5;}
+  .bindBtn:hover:not(:disabled){background:rgba(255,93,162,.12);}
+  .bindBtn:disabled{opacity:.3; cursor:default;}
+  .boxMeta{display:flex; align-items:center; gap:10px; margin-top:10px; font-size:.78rem; color:var(--muted);}
+  .bar{flex:1; height:7px; background:var(--panel2); border-radius:4px; overflow:hidden;}
+  .accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
+  .accPct{min-width:3.2ch; text-align:right; font-variant-numeric:tabular-nums;}
+  .fb{min-width:6ch; font-weight:800; font-size:.85rem; letter-spacing:.08em; text-align:center;}
+  .fb.PARFAIT{color:var(--good);} .fb.BIEN{color:var(--accent2);}
+  .fb.OK{color:var(--ok);} .fb.RATÉ{color:var(--bad);} .fb.PERDU{color:var(--bad);}
+  .boxStatus{margin-top:8px; font-size:.82rem; color:var(--muted);}
+  .boxStatus.active{color:var(--ink);}
+  .boxStatus.lost{color:var(--bad);}
 
-  /* Overlay démarrage */
+  /* Boutique / réglages */
+  .shopBtn{
+    width:100%; padding:11px 14px; margin-bottom:8px; font-size:.88rem; font-weight:600;
+    border-radius:10px; border:2px solid var(--gold); background:transparent; color:var(--ink);
+    cursor:pointer; text-align:left; display:flex; justify-content:space-between; gap:10px;
+  }
+  .shopBtn:hover:not(:disabled){background:rgba(255,209,102,.08);}
+  .shopBtn:disabled{opacity:.35; cursor:default;}
+  .shopBtn .price{color:var(--gold); white-space:nowrap;}
+  .toggleRow{display:flex; align-items:center; gap:10px; padding:6px 0; font-size:.9rem;}
+  .toggleRow input{width:18px; height:18px; accent-color:var(--accent);}
+  #resetBtn{border-color:var(--bad); color:var(--muted); font-weight:400; margin-top:8px;}
+  footer{max-width:680px; padding:0 20px 30px; color:var(--muted); font-size:.75rem; line-height:1.5;}
+
   #overlay{
     position:fixed; inset:0; background:rgba(14,12,20,.96); z-index:10;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:20px; text-align:center;
@@ -86,307 +108,540 @@
     padding:16px 42px; font-size:1.1rem; font-weight:700; border-radius:12px;
     border:none; background:var(--accent); color:#fff; cursor:pointer;
   }
-  #overlay p{color:var(--muted); max-width:400px; font-size:.9rem; line-height:1.5;}
+  #overlay p{color:var(--muted); max-width:440px; font-size:.9rem; line-height:1.5;}
 </style>
 </head>
 <body>
 
 <div id="overlay">
   <h1>🍬 Sugar Box</h1>
-  <p>Active des pas sur la grille, puis <b>frappe en rythme</b> (espace ou le gros bouton)
-  quand la tête de lecture traverse un pas actif. Bien jouer rapporte des sucres.
-  Quand ta précision est bonne, <b>transforme le pattern en looper</b> : il jouera tout seul,
-  à la qualité que tu avais au moment du bind.</p>
+  <p><b>Frappe en rythme</b> (touches 1-4, espace, ou les pads) quand la tête de lecture traverse
+  un pas actif. Bien jouer rapporte des sucres. Quand ta précision est bonne, <b>bind</b> le pattern
+  en looper : il joue tout seul. ⚠ Dès que tu refrappes sur une box, <b>son loop est perdu</b> —
+  il faudra re-bind. Achète de nouvelles box, séquences et extensions dans la boutique.</p>
   <button id="startBtn">▶ Démarrer</button>
 </div>
 
 <header>
-  <h1>Sugar Box <span class="tag">PROTO v0.1</span></h1>
+  <h1>Sugar Box <span class="tag">PROTO v0.2</span></h1>
   <div class="stats">
     <span>🍬 <b id="cash">0</b></span>
     <span class="passive">+<span id="passive">0</span>/s</span>
-    <span><span id="bpmLabel">90</span> BPM</span>
+    <span><span id="bpmLabel">60</span> BPM</span>
   </div>
 </header>
 
 <main>
-  <section>
-    <div id="grid"></div>
-    <p class="hint">Clique sur les cases pour composer ton pattern (les points marquent les temps).</p>
-  </section>
-
-  <section id="pad">
-    <button id="tapPad">FRAPPE<small>[ESPACE]</small></button>
-    <div id="feedback"></div>
-    <div class="gauge">Précision récente
-      <div class="bar"><div id="accBar"></div></div>
-      <span id="accPct">–</span>
-    </div>
-  </section>
-
-  <section>
-    <h2>Looper</h2>
-    <div id="looperStatus">Vide — enchaîne au moins 8 frappes, puis bind ton pattern.</div>
-    <button class="action" id="bindBtn" disabled>⟳ Transformer en looper</button>
-  </section>
+  <div id="boxes"></div>
 
   <section>
     <h2>Boutique</h2>
-    <button class="action" id="buyBpm">+10 BPM — <span id="bpmCost">200</span> 🍬</button>
-    <p class="hint">Plus de BPM = plus de revenu… mais la fenêtre de précision se resserre.</p>
+    <div id="shop"></div>
+    <p class="hint">Le revenu passif = qualité du bind × pas actifs × BPM. Les séquences complexes
+    rapportent plus mais sont plus dures à jouer.</p>
+  </section>
+
+  <section>
+    <h2>Réglages</h2>
+    <label class="toggleRow"><input type="checkbox" id="metroToggle" checked> Métronome</label>
+    <label class="toggleRow" id="droneRow" style="display:none"><input type="checkbox" id="droneToggle"> Nappe de fond (drone)</label>
+    <button class="shopBtn" id="resetBtn">Réinitialiser la partie</button>
   </section>
 </main>
 
 <footer>
-  Boucle testée : frappe manuelle → sucres → bind en looper (revenu passif = qualité du bind ×
-  pas actifs × BPM) → achat BPM → retour à la frappe. Re-bind quand tu veux pour améliorer la
-  qualité gelée du looper.
+  Boucle : frappe manuelle → sucres → bind en looper (qualité gelée) → achats (box, séquences,
+  grille, BPM, drone) → retour à la frappe. Refrapper sur une box détruit son loop : à toi de
+  choisir quand reprendre la main. Sauvegarde automatique locale.
 </footer>
 
 <script>
 'use strict';
 
-// ---------- État ----------
-const NUM_STEPS = 8;
-const pattern = [true,false,false,false,true,false,false,false]; // temps 1 et 3 par défaut
-let bpm = 90;
-let cash = 0;
-let bpmCost = 200;
-const BPM_MAX = 180;
-
-let audio = null;
-let noiseBuf = null;
-let nextStepTime = 0;
-let currentStep = 0;
-let playheadStep = -1;
-
-// pas actifs planifiés récemment/à venir : {time, step, taken}
-const activeStepTimes = [];
-// file des pas planifiés pour l'affichage de la tête de lecture : {time, step}
-const drawQueue = [];
-
-const recentScores = [];       // 8 dernières frappes, valeurs 0..1
+// ---------- Définitions ----------
+const HIT_BASE = 5;
+const LOOPER_RATIO = 0.6;
+const BPM_START = 60, BPM_MAX = 180;
 const BIND_MIN_HITS = 8;
+const DRONE_MULT = 1.25;
+const SAVE_KEY = 'sugarbox-save-v2';
 
-let looper = null;             // {quality, pattern:[...]} — qualité gelée au bind
-let passivePerSec = 0;
+const BOX_DEFS = [
+  { sound: 'clap', icon: '👏', name: 'Box Clap', cost: 0 },
+  { sound: 'pok',  icon: '🪵', name: 'Box Pok',  cost: 500 },
+  { sound: 'kick', icon: '🥁', name: 'Box Kick', cost: 2500 },
+  { sound: 'hat',  icon: '🎩', name: 'Box Tsss', cost: 10000 },
+];
 
-const LOOKAHEAD_MS = 25;
-const SCHEDULE_AHEAD = 0.2;    // s
+// Résolution : 1 pas = 1 croche. Noires = pas pairs, croches = tous les pas.
+const SEQUENCES = [
+  { id: 'pouls',    name: 'Pouls — 2 noires',            len: 8,  steps: [0, 4],                     cost: 0 },
+  { id: 'noires',   name: 'Quatre noires',               len: 8,  steps: [0, 2, 4, 6],               cost: 100 },
+  { id: 'syncope',  name: 'Syncope — noires + croche',   len: 8,  steps: [0, 3, 6],                  cost: 250 },
+  { id: 'offbeat',  name: 'Croches off-beat',            len: 8,  steps: [1, 3, 5, 7],               cost: 400 },
+  { id: 'roulis',   name: 'Roulis — noires + croches',   len: 8,  steps: [0, 2, 3, 4, 6, 7],         cost: 600 },
+  { id: 'marche16', name: 'Longue marche — 2 mesures',   len: 16, steps: [0, 4, 8, 12, 14],          cost: 800,  needsGrid16: true },
+  { id: 'groove16', name: 'Groove complet — 2 mesures',  len: 16, steps: [0, 3, 4, 7, 8, 10, 12, 14], cost: 1500, needsGrid16: true },
+];
+const seqById = id => SEQUENCES.find(s => s.id === id);
 
-// Valeurs économiques
-const HIT_BASE = 5;            // sucres pour une frappe "OK"
-const LOOPER_RATIO = 0.6;      // le looper rapporte 60% d'une frappe équivalente
-
-// ---------- DOM ----------
-const $ = id => document.getElementById(id);
-const gridEl = $('grid'), cashEl = $('cash'), passiveEl = $('passive'),
-      bpmLabelEl = $('bpmLabel'), feedbackEl = $('feedback'),
-      accBarEl = $('accBar'), accPctEl = $('accPct'),
-      bindBtn = $('bindBtn'), looperStatusEl = $('looperStatus'),
-      buyBpmBtn = $('buyBpm'), bpmCostEl = $('bpmCost');
-
-const stepCells = [];
-for (let i = 0; i < NUM_STEPS; i++) {
-  const cell = document.createElement('div');
-  cell.className = 'step' + (pattern[i] ? ' on' : '') + (i % 2 === 0 ? ' beat' : '');
-  cell.addEventListener('pointerdown', () => {
-    pattern[i] = !pattern[i];
-    cell.classList.toggle('on', pattern[i]);
-    updateBindBtn();
-  });
-  gridEl.appendChild(cell);
-  stepCells.push(cell);
+// ---------- État ----------
+let state = defaultState();
+function defaultState() {
+  return {
+    cash: 0, bpm: BPM_START, bpmCost: 200,
+    ownedBoxCount: 1,
+    ownedSeqs: ['pouls'],
+    grid16: false, droneOwned: false, droneOn: false, metronome: true,
+    boxes: [newBox()],
+  };
 }
+function newBox() { return { seqId: 'pouls', looper: null }; }
+
+// Volatile (non sauvegardé)
+let audio = null, noiseBuf = null, droneGraph = null;
+let nextStepTime = 0, absStep = 0;
+let selected = 0;
+const drawQueue = [];
+let runtime = []; // par box : {stepTimes:[], scores:[], playhead:-1}
+
+const LOOKAHEAD_MS = 25, SCHEDULE_AHEAD = 0.2;
+
+// ---------- Sauvegarde ----------
+function save() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s && Array.isArray(s.boxes) && s.boxes.length) state = Object.assign(defaultState(), s);
+  } catch (e) {}
+}
+setInterval(save, 3000);
 
 // ---------- Audio ----------
 function initAudio() {
   audio = new (window.AudioContext || window.webkitAudioContext)();
   const len = Math.floor(audio.sampleRate * 0.2);
   noiseBuf = audio.createBuffer(1, len, audio.sampleRate);
-  const data = noiseBuf.getChannelData(0);
-  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
 }
 
-// Clap : 3 courtes bouffées de bruit filtré
-function clap(t, gain) {
-  for (let i = 0; i < 3; i++) {
-    const t0 = t + i * 0.012;
-    const src = audio.createBufferSource();
-    src.buffer = noiseBuf;
-    const f = audio.createBiquadFilter();
-    f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 0.9;
+function playSound(kind, t, gain) {
+  if (kind === 'clap') {
+    for (let i = 0; i < 3; i++) {
+      const t0 = t + i * 0.012, last = i === 2;
+      const src = audio.createBufferSource(); src.buffer = noiseBuf;
+      const f = audio.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 0.9;
+      const g = audio.createGain();
+      g.gain.setValueAtTime(gain * (last ? 0.8 : 0.45), t0);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + (last ? 0.16 : 0.03));
+      src.connect(f); f.connect(g); g.connect(audio.destination);
+      src.start(t0); src.stop(t0 + 0.2);
+    }
+  } else if (kind === 'pok') {
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.setValueAtTime(760, t);
+    o.frequency.exponentialRampToValueAtTime(380, t + 0.07);
+    g.gain.setValueAtTime(gain * 0.55, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.1);
+  } else if (kind === 'kick') {
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.frequency.setValueAtTime(140, t);
+    o.frequency.exponentialRampToValueAtTime(46, t + 0.12);
+    g.gain.setValueAtTime(gain * 0.9, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.3);
+  } else if (kind === 'hat') {
+    const src = audio.createBufferSource(); src.buffer = noiseBuf;
+    const f = audio.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6500;
     const g = audio.createGain();
-    const last = i === 2;
-    g.gain.setValueAtTime(gain * (last ? 0.8 : 0.45), t0);
-    g.gain.exponentialRampToValueAtTime(0.001, t0 + (last ? 0.16 : 0.03));
+    g.gain.setValueAtTime(gain * 0.35, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
     src.connect(f); f.connect(g); g.connect(audio.destination);
-    src.start(t0); src.stop(t0 + 0.2);
+    src.start(t); src.stop(t + 0.08);
   }
 }
 
-// Métronome discret sur les temps
 function tick(t, accent) {
-  const o = audio.createOscillator();
-  const g = audio.createGain();
+  const o = audio.createOscillator(), g = audio.createGain();
   o.frequency.value = accent ? 1600 : 1100;
-  g.gain.setValueAtTime(accent ? 0.10 : 0.05, t);
+  g.gain.setValueAtTime(accent ? 0.09 : 0.045, t);
   g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
-  o.connect(g); g.connect(audio.destination);
-  o.start(t); o.stop(t + 0.05);
+  o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.05);
 }
 
-// ---------- Séquenceur (horloge audio + lookahead) ----------
-function stepDur() { return 60 / bpm / 2; } // croches : 8 pas = 1 mesure de 4 temps
+function startDrone() {
+  if (droneGraph || !audio) return;
+  const g = audio.createGain(); g.gain.value = 0.05;
+  const f = audio.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 320;
+  const o1 = audio.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 55;
+  const o2 = audio.createOscillator(); o2.type = 'sawtooth'; o2.frequency.value = 55; o2.detune.value = 9;
+  const lfo = audio.createOscillator(); lfo.frequency.value = 0.08;
+  const lfoG = audio.createGain(); lfoG.gain.value = 0.02;
+  lfo.connect(lfoG); lfoG.connect(g.gain);
+  o1.connect(f); o2.connect(f); f.connect(g); g.connect(audio.destination);
+  o1.start(); o2.start(); lfo.start();
+  droneGraph = { o1, o2, lfo };
+}
+function stopDrone() {
+  if (!droneGraph) return;
+  droneGraph.o1.stop(); droneGraph.o2.stop(); droneGraph.lfo.stop();
+  droneGraph = null;
+}
+
+// ---------- Économie ----------
+const droneMult = () => (state.droneOwned && state.droneOn) ? DRONE_MULT : 1;
+const looperHitVal = b => HIT_BASE * LOOPER_RATIO * b.looper.quality * droneMult();
+function passivePerSec() {
+  let total = 0;
+  state.boxes.forEach(b => {
+    if (!b.looper) return;
+    const seq = seqById(b.seqId);
+    // chaque pas actif sonne une fois par cycle ; cycle = len × durée d'un pas
+    total += looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
+  });
+  return total;
+}
+
+// ---------- Séquenceur ----------
+function stepDur() { return 60 / state.bpm / 2; } // croches
 
 function scheduler() {
   while (nextStepTime < audio.currentTime + SCHEDULE_AHEAD) {
-    scheduleStep(currentStep, nextStepTime);
+    scheduleStep(absStep, nextStepTime);
     nextStepTime += stepDur();
-    currentStep = (currentStep + 1) % NUM_STEPS;
+    absStep++;
   }
-  // purge des pas trop anciens
   const cutoff = audio.currentTime - 0.5;
-  while (activeStepTimes.length && activeStepTimes[0].time < cutoff) activeStepTimes.shift();
+  runtime.forEach(r => {
+    while (r.stepTimes.length && r.stepTimes[0].time < cutoff) r.stepTimes.shift();
+  });
 }
 
-function scheduleStep(step, t) {
-  if (step % 2 === 0) tick(t, step === 0);
-  if (pattern[step]) activeStepTimes.push({ time: t, step, taken: false });
-  if (looper && looper.pattern[step]) {
-    clap(t, 0.45);
-    cash += HIT_BASE * LOOPER_RATIO * looper.quality;
-  }
-  drawQueue.push({ time: t, step });
+function scheduleStep(abs, t) {
+  if (state.metronome && abs % 2 === 0) tick(t, abs % 8 === 0);
+  state.boxes.forEach((b, i) => {
+    const seq = seqById(b.seqId);
+    if (!seq.steps.includes(abs % seq.len)) return;
+    runtime[i].stepTimes.push({ time: t, taken: false });
+    if (b.looper) {
+      playSound(BOX_DEFS[i].sound, t, 0.45);
+      state.cash += looperHitVal(b);
+    }
+  });
+  drawQueue.push({ time: t, abs });
 }
 
 // ---------- Frappe manuelle ----------
-const WINDOWS = [                     // fenêtres de précision (secondes)
+const WINDOWS = [
   { d: 0.045, score: 1.0, mult: 3, label: 'PARFAIT' },
   { d: 0.090, score: 0.7, mult: 2, label: 'BIEN' },
   { d: 0.160, score: 0.4, mult: 1, label: 'OK' },
 ];
 
-function tap() {
-  if (!audio) return;
-  if (!pattern.some(Boolean)) { showFeedback('RATÉ', 'Active des pas !'); return; }
+function tap(i) {
+  if (!audio || i >= state.boxes.length) return;
+  selectBox(i);
+  const b = state.boxes[i], r = runtime[i];
   const t = audio.currentTime;
 
+  // Reprendre la main détruit le loop de cette box
+  if (b.looper) {
+    b.looper = null;
+    showFb(i, 'PERDU', 'LOOP PERDU');
+    updateBoxStatus(i);
+  }
+
   let best = null, bestD = Infinity;
-  for (const s of activeStepTimes) {
+  for (const s of r.stepTimes) {
     if (s.taken) continue;
     const d = Math.abs(t - s.time);
     if (d < bestD) { bestD = d; best = s; }
   }
-
   let win = null;
   if (best) for (const w of WINDOWS) { if (bestD <= w.d) { win = w; break; } }
 
   if (win) {
     best.taken = true;
-    clap(t, 1);
-    flashCell(best.step);
-    cash += HIT_BASE * win.mult * (bpm / 90);
-    pushScore(win.score);
-    showFeedback(win.label);
+    playSound(BOX_DEFS[i].sound, t, 1);
+    flashPlayhead(i);
+    state.cash += HIT_BASE * win.mult * (state.bpm / BPM_START) * droneMult();
+    pushScore(r, win.score);
+    showFb(i, win.label);
   } else {
-    clap(t, 0.25);
-    pushScore(0);
-    showFeedback('RATÉ');
+    playSound(BOX_DEFS[i].sound, t, 0.25);
+    pushScore(r, 0);
+    showFb(i, 'RATÉ');
   }
-  updateBindBtn();
+  updateBoxStatus(i);
 }
 
-function pushScore(s) {
-  recentScores.push(s);
-  if (recentScores.length > BIND_MIN_HITS) recentScores.shift();
+function pushScore(r, s) {
+  r.scores.push(s);
+  if (r.scores.length > BIND_MIN_HITS) r.scores.shift();
+}
+const accuracy = r => r.scores.length ? r.scores.reduce((a, b) => a + b, 0) / r.scores.length : 0;
+
+function bind(i) {
+  const r = runtime[i];
+  if (r.scores.length < BIND_MIN_HITS) return;
+  state.boxes[i].looper = { quality: accuracy(r) };
+  updateBoxStatus(i);
+  save();
 }
 
-function accuracy() {
-  if (!recentScores.length) return 0;
-  return recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
+// ---------- UI : boxes ----------
+const boxesEl = document.getElementById('boxes');
+let boxUI = []; // {cells, statusEl, fbEl, accBarEl, accPctEl, bindBtn, cardEl}
+
+function renderBoxes() {
+  boxesEl.innerHTML = '';
+  boxUI = [];
+  state.boxes.forEach((b, i) => {
+    const def = BOX_DEFS[i];
+    const seq = seqById(b.seqId);
+    const card = document.createElement('section');
+    card.className = 'box' + (i === selected ? ' selected' : '');
+    card.addEventListener('pointerdown', () => selectBox(i));
+
+    const head = document.createElement('div');
+    head.className = 'boxHead';
+    head.innerHTML = `<span class="boxName">${def.icon} ${def.name}</span><span class="boxKey">touche [${i + 1}]${i === selected ? ' · espace' : ''}</span>`;
+    card.appendChild(head);
+
+    const grid = document.createElement('div');
+    grid.className = 'grid len' + seq.len;
+    const cells = [];
+    for (let s = 0; s < seq.len; s++) {
+      const cell = document.createElement('div');
+      cell.className = 'step' + (seq.steps.includes(s) ? ' on' : '') + (s % 2 === 0 ? ' beat' : '');
+      grid.appendChild(cell); cells.push(cell);
+    }
+    card.appendChild(grid);
+
+    const sel = document.createElement('select');
+    sel.className = 'seqSelect';
+    SEQUENCES.filter(sq => state.ownedSeqs.includes(sq.id))
+      .filter(sq => !sq.needsGrid16 || state.grid16)
+      .forEach(sq => {
+        const opt = document.createElement('option');
+        opt.value = sq.id;
+        opt.textContent = `${sq.name} (${sq.steps.length} frappes / ${sq.len} pas)`;
+        if (sq.id === b.seqId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    sel.addEventListener('change', () => {
+      b.seqId = sel.value;
+      b.looper = null;               // changer de séquence perd le loop
+      runtime[i].stepTimes = [];
+      runtime[i].scores = [];
+      save(); renderBoxes();
+    });
+    sel.addEventListener('pointerdown', e => e.stopPropagation());
+    card.appendChild(sel);
+
+    const row = document.createElement('div');
+    row.className = 'boxRow';
+    const tapBtn = document.createElement('button');
+    tapBtn.className = 'tapBtn'; tapBtn.textContent = 'FRAPPE';
+    tapBtn.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); tap(i); });
+    const bindBtn = document.createElement('button');
+    bindBtn.className = 'bindBtn'; bindBtn.textContent = '⟳ Bind';
+    bindBtn.disabled = true;
+    bindBtn.addEventListener('pointerdown', e => e.stopPropagation());
+    bindBtn.addEventListener('click', () => bind(i));
+    row.appendChild(tapBtn); row.appendChild(bindBtn);
+    card.appendChild(row);
+
+    const meta = document.createElement('div');
+    meta.className = 'boxMeta';
+    meta.innerHTML = `<span class="fb"></span> Précision <div class="bar"><div class="accBar"></div></div> <span class="accPct">–</span>`;
+    card.appendChild(meta);
+
+    const status = document.createElement('div');
+    status.className = 'boxStatus';
+    card.appendChild(status);
+
+    boxesEl.appendChild(card);
+    boxUI.push({
+      cells, cardEl: card, bindBtn,
+      fbEl: meta.querySelector('.fb'),
+      accBarEl: meta.querySelector('.accBar'),
+      accPctEl: meta.querySelector('.accPct'),
+      statusEl: status,
+    });
+    updateBoxStatus(i);
+  });
 }
 
-let feedbackTimer = null;
-function showFeedback(label, txt) {
-  feedbackEl.textContent = txt || label;
-  feedbackEl.className = label;
-  clearTimeout(feedbackTimer);
-  feedbackTimer = setTimeout(() => { feedbackEl.textContent = ''; }, 700);
+function selectBox(i) {
+  if (i === selected) return;
+  selected = i;
+  boxUI.forEach((u, j) => {
+    u.cardEl.classList.toggle('selected', j === i);
+    u.cardEl.querySelector('.boxKey').textContent = `touche [${j + 1}]` + (j === i ? ' · espace' : '');
+  });
 }
 
-function flashCell(step) {
-  const c = stepCells[step];
-  c.classList.add('hitflash');
-  setTimeout(() => c.classList.remove('hitflash'), 120);
+function updateBoxStatus(i) {
+  const b = state.boxes[i], r = runtime[i], u = boxUI[i];
+  if (!u) return;
+  u.statusEl.classList.remove('active', 'lost');
+  if (b.looper) {
+    const seq = seqById(b.seqId);
+    const rate = looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
+    u.statusEl.classList.add('active');
+    u.statusEl.innerHTML = `Looper actif — qualité <b>${Math.round(b.looper.quality * 100)}%</b> · +${rate.toFixed(1)} 🍬/s <i>(frapper = loop perdu)</i>`;
+  } else if (r.scores.length < BIND_MIN_HITS) {
+    u.statusEl.textContent = `Loop vide — encore ${BIND_MIN_HITS - r.scores.length} frappe(s) avant de pouvoir bind.`;
+  } else {
+    u.statusEl.textContent = `Prêt à bind — qualité actuelle ${Math.round(accuracy(r) * 100)}%.`;
+  }
+  u.bindBtn.disabled = r.scores.length < BIND_MIN_HITS;
 }
 
-// ---------- Looper ----------
-function bind() {
-  if (recentScores.length < BIND_MIN_HITS || !pattern.some(Boolean)) return;
-  looper = { quality: accuracy(), pattern: pattern.slice() };
-  updateLooperUI();
+let fbTimers = {};
+function showFb(i, cls, txt) {
+  const u = boxUI[i]; if (!u) return;
+  u.fbEl.textContent = txt || cls;
+  u.fbEl.className = 'fb ' + cls;
+  clearTimeout(fbTimers[i]);
+  fbTimers[i] = setTimeout(() => { u.fbEl.textContent = ''; }, 700);
+}
+function flashPlayhead(i) {
+  const u = boxUI[i];
+  const cell = u.cells.find(c => c.classList.contains('playhead'));
+  if (!cell) return;
+  cell.classList.add('hitflash');
+  setTimeout(() => cell.classList.remove('hitflash'), 120);
 }
 
-function updateLooperUI() {
-  if (!looper) return;
-  const active = looper.pattern.filter(Boolean).length;
-  // fréquence d'un pas donné : une fois par mesure ; mesure = 240/bpm s
-  passivePerSec = HIT_BASE * LOOPER_RATIO * looper.quality * active * (bpm / 240);
-  looperStatusEl.classList.add('active');
-  looperStatusEl.innerHTML =
-    `Looper actif — qualité du bind <b>${Math.round(looper.quality * 100)}%</b> · ` +
-    `${active} pas · +${passivePerSec.toFixed(1)} 🍬/s`;
-  bindBtn.textContent = '⟳ Re-bind (remplace la qualité gelée)';
-}
+// ---------- UI : boutique ----------
+const shopEl = document.getElementById('shop');
 
-function updateBindBtn() {
-  bindBtn.disabled = recentScores.length < BIND_MIN_HITS || !pattern.some(Boolean);
-}
+function renderShop() {
+  shopEl.innerHTML = '';
+  const add = (label, cost, onBuy) => {
+    const btn = document.createElement('button');
+    btn.className = 'shopBtn';
+    btn.dataset.cost = cost;
+    btn.innerHTML = `<span>${label}</span><span class="price">${cost} 🍬</span>`;
+    btn.addEventListener('click', () => {
+      if (state.cash < cost) return;
+      state.cash -= cost;
+      onBuy(); save(); renderShop(); renderBoxes();
+    });
+    shopEl.appendChild(btn);
+  };
 
-// ---------- Boutique ----------
-buyBpmBtn.addEventListener('click', () => {
-  if (cash < bpmCost || bpm >= BPM_MAX) return;
-  cash -= bpmCost;
-  bpm += 10;
-  bpmCost = Math.round(bpmCost * 1.6);
-  bpmLabelEl.textContent = bpm;
-  if (bpm >= BPM_MAX) { buyBpmBtn.disabled = true; buyBpmBtn.textContent = 'BPM max atteint'; }
-  else bpmCostEl.textContent = bpmCost;
-  if (looper) updateLooperUI(); // le débit du looper suit le BPM
-});
+  if (state.ownedBoxCount < BOX_DEFS.length) {
+    const def = BOX_DEFS[state.ownedBoxCount];
+    add(`Nouvelle Sugar Box : ${def.icon} ${def.name} — nouveau son`, def.cost, () => {
+      state.ownedBoxCount++;
+      state.boxes.push(newBox());
+      runtime.push({ stepTimes: [], scores: [], playhead: -1 });
+    });
+  }
+
+  SEQUENCES.filter(sq => !state.ownedSeqs.includes(sq.id))
+    .filter(sq => !sq.needsGrid16 || state.grid16)
+    .forEach(sq => add(`Séquence : ${sq.name}`, sq.cost, () => state.ownedSeqs.push(sq.id)));
+
+  if (!state.grid16)
+    add('Extension de grille — 16 pas (2 mesures), débloque les séquences longues', 1500,
+      () => { state.grid16 = true; });
+
+  if (!state.droneOwned)
+    add(`Nappe de fond (drone) — ambiance + revenus ×${DRONE_MULT}`, 800, () => {
+      state.droneOwned = true; state.droneOn = true;
+      document.getElementById('droneRow').style.display = '';
+      document.getElementById('droneToggle').checked = true;
+      startDrone();
+    });
+
+  if (state.bpm < BPM_MAX)
+    add(`+10 BPM (${state.bpm} → ${state.bpm + 10}) — plus de débit, précision plus dure`, state.bpmCost, () => {
+      state.bpm += 10;
+      state.bpmCost = Math.round(state.bpmCost * 1.6);
+      document.getElementById('bpmLabel').textContent = state.bpm;
+    });
+}
 
 // ---------- Boucle d'affichage ----------
 function draw() {
   if (audio) {
     const now = audio.currentTime;
-    while (drawQueue.length && drawQueue[0].time <= now) {
-      playheadStep = drawQueue.shift().step;
+    let last = null;
+    while (drawQueue.length && drawQueue[0].time <= now) last = drawQueue.shift();
+    if (last !== null) {
+      state.boxes.forEach((b, i) => {
+        const seq = seqById(b.seqId);
+        const ph = last.abs % seq.len;
+        const u = boxUI[i];
+        if (u && runtime[i].playhead !== ph) {
+          u.cells.forEach((c, s) => c.classList.toggle('playhead', s === ph));
+          runtime[i].playhead = ph;
+        }
+      });
     }
-    stepCells.forEach((c, i) => c.classList.toggle('playhead', i === playheadStep));
-
-    cashEl.textContent = Math.floor(cash);
-    passiveEl.textContent = looper ? passivePerSec.toFixed(1) : '0';
-    const acc = accuracy();
-    accBarEl.style.width = (acc * 100) + '%';
-    accPctEl.textContent = recentScores.length ? Math.round(acc * 100) + '%' : '–';
-    buyBpmBtn.disabled = bpm >= BPM_MAX || cash < bpmCost;
+    document.getElementById('cash').textContent = Math.floor(state.cash);
+    document.getElementById('passive').textContent = passivePerSec().toFixed(1);
+    boxUI.forEach((u, i) => {
+      const acc = accuracy(runtime[i]);
+      u.accBarEl.style.width = (acc * 100) + '%';
+      u.accPctEl.textContent = runtime[i].scores.length ? Math.round(acc * 100) + '%' : '–';
+    });
+    shopEl.querySelectorAll('.shopBtn').forEach(btn => {
+      btn.disabled = state.cash < Number(btn.dataset.cost);
+    });
   }
   requestAnimationFrame(draw);
 }
 
 // ---------- Entrées ----------
-$('tapPad').addEventListener('pointerdown', e => { e.preventDefault(); tap(); });
 document.addEventListener('keydown', e => {
-  if (e.code === 'Space' && !e.repeat) { e.preventDefault(); tap(); }
+  if (e.repeat) return;
+  if (e.code === 'Space') { e.preventDefault(); tap(selected); }
+  const n = ['Digit1', 'Digit2', 'Digit3', 'Digit4'].indexOf(e.code);
+  if (n >= 0 && n < state.boxes.length) { e.preventDefault(); tap(n); }
 });
-bindBtn.addEventListener('click', bind);
+
+document.getElementById('metroToggle').addEventListener('change', e => {
+  state.metronome = e.target.checked; save();
+});
+document.getElementById('droneToggle').addEventListener('change', e => {
+  state.droneOn = e.target.checked;
+  if (state.droneOn) startDrone(); else stopDrone();
+  save();
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (!confirm('Réinitialiser toute la partie ?')) return;
+  localStorage.removeItem(SAVE_KEY);
+  location.reload();
+});
 
 // ---------- Démarrage ----------
-$('startBtn').addEventListener('click', () => {
+load();
+runtime = state.boxes.map(() => ({ stepTimes: [], scores: [], playhead: -1 }));
+document.getElementById('bpmLabel').textContent = state.bpm;
+document.getElementById('metroToggle').checked = state.metronome;
+if (state.droneOwned) {
+  document.getElementById('droneRow').style.display = '';
+  document.getElementById('droneToggle').checked = state.droneOn;
+}
+renderBoxes();
+renderShop();
+
+document.getElementById('startBtn').addEventListener('click', () => {
   initAudio();
   nextStepTime = audio.currentTime + 0.1;
-  currentStep = 0;
+  absStep = 0;
+  if (state.droneOwned && state.droneOn) startDrone();
   setInterval(scheduler, LOOKAHEAD_MS);
   requestAnimationFrame(draw);
   document.getElementById('overlay').remove();
