@@ -51,6 +51,7 @@
   }
   .grid.len16 .step{border-radius:5px; border-width:1px;}
   .step.on{background:var(--accent); border-color:var(--accent);}
+  .step.ghost{background:#463d5c; border-color:#463d5c;}
   .step.beat::after{
     content:""; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
     width:3px; height:3px; border-radius:50%; background:#4a4360;
@@ -78,12 +79,12 @@
   .bar{flex:1; height:7px; background:var(--panel2); border-radius:4px; overflow:hidden;}
   .accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
   .accPct{min-width:3.2ch; text-align:right; font-variant-numeric:tabular-nums;}
-  .fb{min-width:6ch; font-weight:800; font-size:.85rem; letter-spacing:.08em; text-align:center;}
+  .combo{min-width:6ch; font-variant-numeric:tabular-nums; color:var(--accent2); font-weight:700;}
+  .fb{min-width:7ch; font-weight:800; font-size:.85rem; letter-spacing:.08em; text-align:center;}
   .fb.PARFAIT{color:var(--good);} .fb.BIEN{color:var(--accent2);}
-  .fb.OK{color:var(--ok);} .fb.RATÉ{color:var(--bad);} .fb.PERDU{color:var(--bad);}
+  .fb.OK{color:var(--ok);} .fb.CLICK{color:var(--muted); font-weight:600;}
   .boxStatus{margin-top:8px; font-size:.82rem; color:var(--muted);}
   .boxStatus.active{color:var(--ink);}
-  .boxStatus.lost{color:var(--bad);}
 
   /* Boutique / réglages */
   .shopBtn{
@@ -94,6 +95,8 @@
   .shopBtn:hover:not(:disabled){background:rgba(255,209,102,.08);}
   .shopBtn:disabled{opacity:.35; cursor:default;}
   .shopBtn .price{color:var(--gold); white-space:nowrap;}
+  .shopBtn.loopBuy{border-color:var(--accent);}
+  .shopBtn.loopBuy .price{color:var(--accent);}
   .toggleRow{display:flex; align-items:center; gap:10px; padding:6px 0; font-size:.9rem;}
   .toggleRow input{width:18px; height:18px; accent-color:var(--accent);}
   #resetBtn{border-color:var(--bad); color:var(--muted); font-weight:400; margin-top:8px;}
@@ -108,22 +111,23 @@
     padding:16px 42px; font-size:1.1rem; font-weight:700; border-radius:12px;
     border:none; background:var(--accent); color:#fff; cursor:pointer;
   }
-  #overlay p{color:var(--muted); max-width:440px; font-size:.9rem; line-height:1.5;}
+  #overlay p{color:var(--muted); max-width:460px; font-size:.9rem; line-height:1.5;}
 </style>
 </head>
 <body>
 
 <div id="overlay">
   <h1>🍬 Sugar Box</h1>
-  <p><b>Frappe en rythme</b> (touches 1-4, espace, ou les pads) quand la tête de lecture traverse
-  un pas actif. Bien jouer rapporte des sucres. Quand ta précision est bonne, <b>bind</b> le pattern
-  en looper : il joue tout seul. ⚠ Dès que tu refrappes sur une box, <b>son loop est perdu</b> —
-  il faudra re-bind. Achète de nouvelles box, séquences et extensions dans la boutique.</p>
+  <p>Clique autant que tu veux : chaque clic rapporte au moins 1 🍬. Mais <b>frapper en rythme</b>
+  (touches 1-4, espace, ou les pads) rapporte beaucoup plus, et enchaîner les frappes précises monte
+  un <b>combo jusqu'à ×4</b>. Les rythmes déjà achetés rapportent toujours, même sans être activés
+  (cases fantômes). <b>Bind</b> un rythme en looper (achat requis par rythme) pour du revenu passif —
+  et continue de cliquer par-dessus.</p>
   <button id="startBtn">▶ Démarrer</button>
 </div>
 
 <header>
-  <h1>Sugar Box <span class="tag">PROTO v0.2</span></h1>
+  <h1>Sugar Box <span class="tag">PROTO v0.3</span></h1>
   <div class="stats">
     <span>🍬 <b id="cash">0</b></span>
     <span class="passive">+<span id="passive">0</span>/s</span>
@@ -137,8 +141,9 @@
   <section>
     <h2>Boutique</h2>
     <div id="shop"></div>
-    <p class="hint">Le revenu passif = qualité du bind × pas actifs × BPM. Les séquences complexes
-    rapportent plus mais sont plus dures à jouer.</p>
+    <p class="hint">Acheter un rythme le rend actif par défaut sur la box sélectionnée — les anciens
+    rapportent toujours (cases fantômes). L'achat <b>Loop</b> d'un rythme permet de le bind en looper.
+    Le passif = qualité du bind × frappes du rythme × BPM.</p>
   </section>
 
   <section>
@@ -150,9 +155,9 @@
 </main>
 
 <footer>
-  Boucle : frappe manuelle → sucres → bind en looper (qualité gelée) → achats (box, séquences,
-  grille, BPM, drone) → retour à la frappe. Refrapper sur une box détruit son loop : à toi de
-  choisir quand reprendre la main. Sauvegarde automatique locale.
+  Boucle : clic libre (+1) ou frappe en rythme (précision × combo, bien plus rentable que le spam) →
+  sucres → achats (rythmes, loops, box, grille, BPM, drone) → bind en looper (qualité gelée, on peut
+  cliquer par-dessus) → re-bind quand tu veux pour améliorer. Sauvegarde automatique locale.
 </footer>
 
 <script>
@@ -160,11 +165,13 @@
 
 // ---------- Définitions ----------
 const HIT_BASE = 5;
+const CLICK_MIN = 1;               // tout clic rapporte au moins ça
 const LOOPER_RATIO = 0.6;
 const BPM_START = 60, BPM_MAX = 180;
 const BIND_MIN_HITS = 8;
 const DRONE_MULT = 1.25;
-const SAVE_KEY = 'sugarbox-save-v2';
+const COMBO_STEP = 0.5, COMBO_CAP = 6; // multiplicateur : 1 → ×4 en 7 frappes précises
+const SAVE_KEY = 'sugarbox-save-v3';
 
 const BOX_DEFS = [
   { sound: 'clap', icon: '👏', name: 'Box Clap', cost: 0 },
@@ -174,14 +181,15 @@ const BOX_DEFS = [
 ];
 
 // Résolution : 1 pas = 1 croche. Noires = pas pairs, croches = tous les pas.
+// cost = jouer le rythme ; loopCost = droit de le bind en looper.
 const SEQUENCES = [
-  { id: 'pouls',    name: 'Pouls — 2 noires',            len: 8,  steps: [0, 4],                     cost: 0 },
-  { id: 'noires',   name: 'Quatre noires',               len: 8,  steps: [0, 2, 4, 6],               cost: 100 },
-  { id: 'syncope',  name: 'Syncope — noires + croche',   len: 8,  steps: [0, 3, 6],                  cost: 250 },
-  { id: 'offbeat',  name: 'Croches off-beat',            len: 8,  steps: [1, 3, 5, 7],               cost: 400 },
-  { id: 'roulis',   name: 'Roulis — noires + croches',   len: 8,  steps: [0, 2, 3, 4, 6, 7],         cost: 600 },
-  { id: 'marche16', name: 'Longue marche — 2 mesures',   len: 16, steps: [0, 4, 8, 12, 14],          cost: 800,  needsGrid16: true },
-  { id: 'groove16', name: 'Groove complet — 2 mesures',  len: 16, steps: [0, 3, 4, 7, 8, 10, 12, 14], cost: 1500, needsGrid16: true },
+  { id: 'pouls',    name: 'Pouls — 2 noires',            len: 8,  steps: [0, 4],                      cost: 0,    loopCost: 0 },
+  { id: 'noires',   name: 'Quatre noires',               len: 8,  steps: [0, 2, 4, 6],                cost: 100,  loopCost: 150 },
+  { id: 'syncope',  name: 'Syncope — noires + croche',   len: 8,  steps: [0, 3, 6],                   cost: 250,  loopCost: 300 },
+  { id: 'offbeat',  name: 'Croches off-beat',            len: 8,  steps: [1, 3, 5, 7],                cost: 400,  loopCost: 450 },
+  { id: 'roulis',   name: 'Roulis — noires + croches',   len: 8,  steps: [0, 2, 3, 4, 6, 7],          cost: 600,  loopCost: 700 },
+  { id: 'marche16', name: 'Longue marche — 2 mesures',   len: 16, steps: [0, 4, 8, 12, 14],           cost: 800,  loopCost: 900,  needsGrid16: true },
+  { id: 'groove16', name: 'Groove complet — 2 mesures',  len: 16, steps: [0, 3, 4, 7, 8, 10, 12, 14], cost: 1500, loopCost: 1600, needsGrid16: true },
 ];
 const seqById = id => SEQUENCES.find(s => s.id === id);
 
@@ -192,18 +200,19 @@ function defaultState() {
     cash: 0, bpm: BPM_START, bpmCost: 200,
     ownedBoxCount: 1,
     ownedSeqs: ['pouls'],
+    loopRights: ['pouls'],
     grid16: false, droneOwned: false, droneOn: false, metronome: true,
     boxes: [newBox()],
   };
 }
-function newBox() { return { seqId: 'pouls', looper: null }; }
+function newBox() { return { seqId: 'pouls', looper: null }; } // looper = {quality, seqId}
 
 // Volatile (non sauvegardé)
 let audio = null, noiseBuf = null, droneGraph = null;
 let nextStepTime = 0, absStep = 0;
 let selected = 0;
 const drawQueue = [];
-let runtime = []; // par box : {stepTimes:[], scores:[], playhead:-1}
+let runtime = []; // par box : {stepTimes:[], scores:[], combo:0, playhead:-1}
 
 const LOOKAHEAD_MS = 25, SCHEDULE_AHEAD = 0.2;
 
@@ -301,11 +310,20 @@ function passivePerSec() {
   let total = 0;
   state.boxes.forEach(b => {
     if (!b.looper) return;
-    const seq = seqById(b.seqId);
+    const seq = seqById(b.looper.seqId);
     // chaque pas actif sonne une fois par cycle ; cycle = len × durée d'un pas
     total += looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
   });
   return total;
+}
+
+// Union des rythmes possédés : un pas "scorable" à cette position absolue ?
+function unionActive(abs) {
+  return state.ownedSeqs.some(id => {
+    const seq = seqById(id);
+    if (seq.needsGrid16 && !state.grid16) return false;
+    return seq.steps.includes(abs % seq.len);
+  });
 }
 
 // ---------- Séquenceur ----------
@@ -325,13 +343,15 @@ function scheduler() {
 
 function scheduleStep(abs, t) {
   if (state.metronome && abs % 2 === 0) tick(t, abs % 8 === 0);
+  const scorable = unionActive(abs);
   state.boxes.forEach((b, i) => {
-    const seq = seqById(b.seqId);
-    if (!seq.steps.includes(abs % seq.len)) return;
-    runtime[i].stepTimes.push({ time: t, taken: false });
+    if (scorable) runtime[i].stepTimes.push({ time: t, taken: false });
     if (b.looper) {
-      playSound(BOX_DEFS[i].sound, t, 0.45);
-      state.cash += looperHitVal(b);
+      const seq = seqById(b.looper.seqId);
+      if (seq.steps.includes(abs % seq.len)) {
+        playSound(BOX_DEFS[i].sound, t, 0.45);
+        state.cash += looperHitVal(b);
+      }
     }
   });
   drawQueue.push({ time: t, abs });
@@ -339,23 +359,18 @@ function scheduleStep(abs, t) {
 
 // ---------- Frappe manuelle ----------
 const WINDOWS = [
-  { d: 0.045, score: 1.0, mult: 3, label: 'PARFAIT' },
-  { d: 0.090, score: 0.7, mult: 2, label: 'BIEN' },
-  { d: 0.160, score: 0.4, mult: 1, label: 'OK' },
+  { d: 0.045, score: 1.0, mult: 3, label: 'PARFAIT', combo: 'up' },
+  { d: 0.090, score: 0.7, mult: 2, label: 'BIEN',    combo: 'up' },
+  { d: 0.160, score: 0.4, mult: 1, label: 'OK',      combo: 'keep' },
 ];
+
+function comboMult(r) { return 1 + Math.min(r.combo, COMBO_CAP) * COMBO_STEP; }
 
 function tap(i) {
   if (!audio || i >= state.boxes.length) return;
   selectBox(i);
   const b = state.boxes[i], r = runtime[i];
   const t = audio.currentTime;
-
-  // Reprendre la main détruit le loop de cette box
-  if (b.looper) {
-    b.looper = null;
-    showFb(i, 'PERDU', 'LOOP PERDU');
-    updateBoxStatus(i);
-  }
 
   let best = null, bestD = Infinity;
   for (const s of r.stepTimes) {
@@ -370,13 +385,18 @@ function tap(i) {
     best.taken = true;
     playSound(BOX_DEFS[i].sound, t, 1);
     flashPlayhead(i);
-    state.cash += HIT_BASE * win.mult * (state.bpm / BPM_START) * droneMult();
+    const gain = HIT_BASE * win.mult * comboMult(r) * (state.bpm / BPM_START) * droneMult();
+    state.cash += gain;
+    if (win.combo === 'up') r.combo++;
     pushScore(r, win.score);
-    showFb(i, win.label);
+    showFb(i, win.label, `${win.label} +${Math.round(gain)}`);
   } else {
+    // clic hors rythme : ça reste un clicker — minimum garanti, mais le combo tombe
     playSound(BOX_DEFS[i].sound, t, 0.25);
+    state.cash += CLICK_MIN;
+    r.combo = 0;
     pushScore(r, 0);
-    showFb(i, 'RATÉ');
+    showFb(i, 'CLICK', '+' + CLICK_MIN);
   }
   updateBoxStatus(i);
 }
@@ -388,16 +408,16 @@ function pushScore(r, s) {
 const accuracy = r => r.scores.length ? r.scores.reduce((a, b) => a + b, 0) / r.scores.length : 0;
 
 function bind(i) {
-  const r = runtime[i];
-  if (r.scores.length < BIND_MIN_HITS) return;
-  state.boxes[i].looper = { quality: accuracy(r) };
+  const b = state.boxes[i], r = runtime[i];
+  if (r.scores.length < BIND_MIN_HITS || !state.loopRights.includes(b.seqId)) return;
+  b.looper = { quality: accuracy(r), seqId: b.seqId };
   updateBoxStatus(i);
   save();
 }
 
 // ---------- UI : boxes ----------
 const boxesEl = document.getElementById('boxes');
-let boxUI = []; // {cells, statusEl, fbEl, accBarEl, accPctEl, bindBtn, cardEl}
+let boxUI = [];
 
 function renderBoxes() {
   boxesEl.innerHTML = '';
@@ -414,12 +434,18 @@ function renderBoxes() {
     head.innerHTML = `<span class="boxName">${def.icon} ${def.name}</span><span class="boxKey">touche [${i + 1}]${i === selected ? ' · espace' : ''}</span>`;
     card.appendChild(head);
 
+    // Grille : rythme actif en plein, pas des autres rythmes possédés en fantôme
+    const gridLen = state.grid16 ? 16 : 8;
     const grid = document.createElement('div');
-    grid.className = 'grid len' + seq.len;
+    grid.className = 'grid len' + gridLen;
     const cells = [];
-    for (let s = 0; s < seq.len; s++) {
+    for (let s = 0; s < gridLen; s++) {
       const cell = document.createElement('div');
-      cell.className = 'step' + (seq.steps.includes(s) ? ' on' : '') + (s % 2 === 0 ? ' beat' : '');
+      let cls = 'step';
+      if (seq.steps.includes(s % seq.len)) cls += ' on';
+      else if (unionActive(s)) cls += ' ghost';
+      if (s % 2 === 0) cls += ' beat';
+      cell.className = cls;
       grid.appendChild(cell); cells.push(cell);
     }
     card.appendChild(grid);
@@ -431,15 +457,13 @@ function renderBoxes() {
       .forEach(sq => {
         const opt = document.createElement('option');
         opt.value = sq.id;
-        opt.textContent = `${sq.name} (${sq.steps.length} frappes / ${sq.len} pas)`;
+        const loopTag = state.loopRights.includes(sq.id) ? '' : ' — loop non acheté';
+        opt.textContent = `${sq.name} (${sq.steps.length} frappes)${loopTag}`;
         if (sq.id === b.seqId) opt.selected = true;
         sel.appendChild(opt);
       });
     sel.addEventListener('change', () => {
-      b.seqId = sel.value;
-      b.looper = null;               // changer de séquence perd le loop
-      runtime[i].stepTimes = [];
-      runtime[i].scores = [];
+      b.seqId = sel.value;   // le looper en cours continue sur son propre rythme
       save(); renderBoxes();
     });
     sel.addEventListener('pointerdown', e => e.stopPropagation());
@@ -460,7 +484,7 @@ function renderBoxes() {
 
     const meta = document.createElement('div');
     meta.className = 'boxMeta';
-    meta.innerHTML = `<span class="fb"></span> Précision <div class="bar"><div class="accBar"></div></div> <span class="accPct">–</span>`;
+    meta.innerHTML = `<span class="fb"></span><span class="combo"></span> Précision <div class="bar"><div class="accBar"></div></div> <span class="accPct">–</span>`;
     card.appendChild(meta);
 
     const status = document.createElement('div');
@@ -471,6 +495,7 @@ function renderBoxes() {
     boxUI.push({
       cells, cardEl: card, bindBtn,
       fbEl: meta.querySelector('.fb'),
+      comboEl: meta.querySelector('.combo'),
       accBarEl: meta.querySelector('.accBar'),
       accPctEl: meta.querySelector('.accPct'),
       statusEl: status,
@@ -491,18 +516,25 @@ function selectBox(i) {
 function updateBoxStatus(i) {
   const b = state.boxes[i], r = runtime[i], u = boxUI[i];
   if (!u) return;
-  u.statusEl.classList.remove('active', 'lost');
+  u.statusEl.classList.remove('active');
+  const parts = [];
   if (b.looper) {
-    const seq = seqById(b.seqId);
+    const seq = seqById(b.looper.seqId);
     const rate = looperHitVal(b) * seq.steps.length / (seq.len * stepDur());
     u.statusEl.classList.add('active');
-    u.statusEl.innerHTML = `Looper actif — qualité <b>${Math.round(b.looper.quality * 100)}%</b> · +${rate.toFixed(1)} 🍬/s <i>(frapper = loop perdu)</i>`;
-  } else if (r.scores.length < BIND_MIN_HITS) {
-    u.statusEl.textContent = `Loop vide — encore ${BIND_MIN_HITS - r.scores.length} frappe(s) avant de pouvoir bind.`;
+    parts.push(`Looper : ${seq.name} — qualité <b>${Math.round(b.looper.quality * 100)}%</b> · +${rate.toFixed(1)} 🍬/s`);
   } else {
-    u.statusEl.textContent = `Prêt à bind — qualité actuelle ${Math.round(accuracy(r) * 100)}%.`;
+    parts.push('Looper vide.');
   }
-  u.bindBtn.disabled = r.scores.length < BIND_MIN_HITS;
+  if (!state.loopRights.includes(b.seqId)) {
+    parts.push(`Achète « Loop » pour bind ${seqById(b.seqId).name}.`);
+  } else if (r.scores.length < BIND_MIN_HITS) {
+    parts.push(`Encore ${BIND_MIN_HITS - r.scores.length} frappe(s) avant de pouvoir bind.`);
+  } else {
+    parts.push(`Bind possible à ${Math.round(accuracy(r) * 100)}%.`);
+  }
+  u.statusEl.innerHTML = parts.join(' ');
+  u.bindBtn.disabled = r.scores.length < BIND_MIN_HITS || !state.loopRights.includes(b.seqId);
 }
 
 let fbTimers = {};
@@ -526,9 +558,9 @@ const shopEl = document.getElementById('shop');
 
 function renderShop() {
   shopEl.innerHTML = '';
-  const add = (label, cost, onBuy) => {
+  const add = (label, cost, onBuy, cls) => {
     const btn = document.createElement('button');
-    btn.className = 'shopBtn';
+    btn.className = 'shopBtn' + (cls ? ' ' + cls : '');
     btn.dataset.cost = cost;
     btn.innerHTML = `<span>${label}</span><span class="price">${cost} 🍬</span>`;
     btn.addEventListener('click', () => {
@@ -544,16 +576,25 @@ function renderShop() {
     add(`Nouvelle Sugar Box : ${def.icon} ${def.name} — nouveau son`, def.cost, () => {
       state.ownedBoxCount++;
       state.boxes.push(newBox());
-      runtime.push({ stepTimes: [], scores: [], playhead: -1 });
+      runtime.push({ stepTimes: [], scores: [], combo: 0, playhead: -1 });
     });
   }
 
+  // Rythmes à jouer (le nouvel achat devient le rythme par défaut de la box sélectionnée)
   SEQUENCES.filter(sq => !state.ownedSeqs.includes(sq.id))
     .filter(sq => !sq.needsGrid16 || state.grid16)
-    .forEach(sq => add(`Séquence : ${sq.name}`, sq.cost, () => state.ownedSeqs.push(sq.id)));
+    .forEach(sq => add(`Rythme : ${sq.name}`, sq.cost, () => {
+      state.ownedSeqs.push(sq.id);
+      state.boxes[selected].seqId = sq.id;
+    }));
+
+  // Droits de loop pour les rythmes possédés
+  SEQUENCES.filter(sq => state.ownedSeqs.includes(sq.id) && !state.loopRights.includes(sq.id))
+    .forEach(sq => add(`Loop : ${sq.name} — permet de le bind en looper`, sq.loopCost,
+      () => state.loopRights.push(sq.id), 'loopBuy'));
 
   if (!state.grid16)
-    add('Extension de grille — 16 pas (2 mesures), débloque les séquences longues', 1500,
+    add('Extension de grille — 16 pas (2 mesures), débloque les rythmes longs', 1500,
       () => { state.grid16 = true; });
 
   if (!state.droneOwned)
@@ -579,11 +620,9 @@ function draw() {
     let last = null;
     while (drawQueue.length && drawQueue[0].time <= now) last = drawQueue.shift();
     if (last !== null) {
-      state.boxes.forEach((b, i) => {
-        const seq = seqById(b.seqId);
-        const ph = last.abs % seq.len;
-        const u = boxUI[i];
-        if (u && runtime[i].playhead !== ph) {
+      boxUI.forEach((u, i) => {
+        const ph = last.abs % u.cells.length;
+        if (runtime[i].playhead !== ph) {
           u.cells.forEach((c, s) => c.classList.toggle('playhead', s === ph));
           runtime[i].playhead = ph;
         }
@@ -592,9 +631,11 @@ function draw() {
     document.getElementById('cash').textContent = Math.floor(state.cash);
     document.getElementById('passive').textContent = passivePerSec().toFixed(1);
     boxUI.forEach((u, i) => {
-      const acc = accuracy(runtime[i]);
+      const r = runtime[i];
+      const acc = accuracy(r);
       u.accBarEl.style.width = (acc * 100) + '%';
-      u.accPctEl.textContent = runtime[i].scores.length ? Math.round(acc * 100) + '%' : '–';
+      u.accPctEl.textContent = r.scores.length ? Math.round(acc * 100) + '%' : '–';
+      u.comboEl.textContent = r.combo > 0 ? '×' + comboMult(r).toFixed(1) : '';
     });
     shopEl.querySelectorAll('.shopBtn').forEach(btn => {
       btn.disabled = state.cash < Number(btn.dataset.cost);
@@ -627,7 +668,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 // ---------- Démarrage ----------
 load();
-runtime = state.boxes.map(() => ({ stepTimes: [], scores: [], playhead: -1 }));
+runtime = state.boxes.map(() => ({ stepTimes: [], scores: [], combo: 0, playhead: -1 }));
 document.getElementById('bpmLabel').textContent = state.bpm;
 document.getElementById('metroToggle').checked = state.metronome;
 if (state.droneOwned) {

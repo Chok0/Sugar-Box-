@@ -11,18 +11,19 @@ python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-## La boucle (v0.2)
+## La boucle (v0.3)
 
-1. **Frapper** (touches 1-4, espace ou les pads) quand la tête de lecture traverse un pas actif — la précision (PARFAIT / BIEN / OK / RATÉ) détermine le gain en sucres.
-2. **Bind** : après 8 frappes, geler la qualité en looper — il joue tout seul et génère du passif : `qualité_du_bind × pas_actifs × BPM`.
-3. **Règle clé** : refrapper sur une box **détruit son loop** — pas de superposition qui perturbe la synchro ; à toi de choisir quand reprendre la main (le passif s'arrête jusqu'au re-bind). Changer de séquence perd aussi le loop.
-4. **Acheter** dans la boutique, puis retour à la frappe.
+1. **Cliquer rapporte toujours** : un clic hors rythme donne +1 🍬 (ça reste un clicker), mais il casse le combo.
+2. **Frapper en rythme** (touches 1-4, espace ou les pads) rapporte bien plus : `5 🍬 × précision (×1/×2/×3) × combo (jusqu'à ×4) × BPM`. Le combo monte sur les frappes PARFAIT/BIEN consécutives — c'est ce qui rend le jeu propre plus rentable que le spam.
+3. **Rythmes cumulatifs** : acheter un rythme le rend actif par défaut, mais tous les rythmes possédés continuent de rapporter si on les frappe (cases fantômes sur la grille), sans avoir à les activer.
+4. **Bind** : après 8 frappes, geler la qualité en looper — passif = `qualité_du_bind × frappes_du_rythme × BPM`. On peut cliquer par-dessus le looper sans le perdre ; re-bind remplace la qualité. Le droit de bind s'achète **par rythme** (achat « Loop », le rythme de départ l'inclut).
 
 ## Contenu achetable
 
 - **Sugar Box supplémentaires** (jusqu'à 4), chacune avec son propre son (clap, pok, kick, hi-hat), sa grille et son looper indépendant — jouer l'une pendant que les autres tournent
-- **Séquences** de complexité croissante : noires seules → noires + croches → syncopes → off-beat → roulement
-- **Extension de grille 16 pas** (2 mesures) qui débloque les séquences longues
+- **Rythmes** de complexité croissante : noires seules → noires + croches → syncopes → off-beat → roulement
+- **Loops** : le droit de bind chaque rythme en looper (achat séparé par rythme)
+- **Extension de grille 16 pas** (2 mesures) qui débloque les rythmes longs
 - **Nappe de fond (drone)** : ambiance + revenus ×1.25, activable/désactivable
 - **BPM** : 60 → 180, +10 par achat (coût ×1.6) — plus de débit, précision plus dure
 
@@ -30,9 +31,11 @@ python3 -m http.server 8000
 
 | Paramètre | Valeur |
 |---|---|
-| Fenêtres de précision | ±45 ms (parfait ×3), ±90 ms (bien ×2), ±160 ms (ok ×1) |
-| Gain par frappe | 5 🍬 × multiplicateur × (BPM/60) × drone |
-| Rendement looper | 60 % d'une frappe équivalente, pondéré par la qualité du bind |
+| Clic hors rythme | +1 🍬 fixe, remet le combo à zéro |
+| Fenêtres de précision | ±45 ms (parfait ×3), ±90 ms (bien ×2), ±160 ms (ok ×1, maintient le combo) |
+| Combo | +0.5 par frappe PARFAIT/BIEN, plafonné à ×4 |
+| Gain par frappe en rythme | 5 🍬 × précision × combo × (BPM/60) × drone |
+| Rendement looper | 60 % d'une frappe équivalente (sans combo), pondéré par la qualité du bind |
 | Tempo de départ | 60 BPM |
 | Résolution | 1 pas = 1 croche ; 8 pas = 1 mesure |
 | Métronome | activable/désactivable dans les réglages |
