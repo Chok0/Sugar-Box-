@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sugar Box — prototype</title>
+<style>
+  :root{
+    --bg:#14121a; --panel:#1e1b26; --panel2:#262230;
+    --ink:#f2eef7; --muted:#9a92ab;
+    --accent:#ff5da2; --accent2:#5dd6ff; --gold:#ffd166;
+    --good:#7bd88f; --ok:#ffd166; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    display:flex; flex-direction:column; align-items:center; min-height:100vh;
+  }
+  header{
+    width:100%; max-width:640px; padding:16px 20px 8px;
+    display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;
+  }
+  h1{font-size:1.3rem; margin:0;}
+  h1 .tag{font-size:.7rem; color:var(--muted); font-weight:normal; letter-spacing:.08em;}
+  .stats{display:flex; gap:16px; font-variant-numeric:tabular-nums; font-size:.95rem;}
+  .stats b{color:var(--gold);}
+  .stats .passive{color:var(--accent2);}
+  main{width:100%; max-width:640px; padding:0 20px 40px; display:flex; flex-direction:column; gap:14px;}
+  section{background:var(--panel); border-radius:14px; padding:14px 16px;}
+  h2{font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:0 0 10px;}
+
+  /* Grille */
+  #grid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px;}
+  .step{
+    aspect-ratio:1; border-radius:10px; border:2px solid #3a3448;
+    background:var(--panel2); cursor:pointer; position:relative;
+    transition:background .08s, border-color .08s, transform .05s;
+  }
+  .step.on{background:var(--accent); border-color:var(--accent);}
+  .step.beat::after{
+    content:""; position:absolute; top:-9px; left:50%; transform:translateX(-50%);
+    width:4px; height:4px; border-radius:50%; background:#4a4360;
+  }
+  .step.playhead{border-color:var(--accent2); box-shadow:0 0 10px 1px rgba(93,214,255,.55);}
+  .step.hitflash{transform:scale(1.12); border-color:#fff;}
+  .hint{color:var(--muted); font-size:.8rem; margin:10px 0 0;}
+
+  /* Pad de frappe */
+  #pad{display:flex; flex-direction:column; align-items:center; gap:10px;}
+  #tapPad{
+    width:100%; padding:26px 0; font-size:1.25rem; font-weight:700; letter-spacing:.12em;
+    color:var(--ink); background:linear-gradient(160deg,#332b45,#241f31);
+    border:2px solid #4a4360; border-radius:14px; cursor:pointer; user-select:none;
+  }
+  #tapPad:active{transform:scale(.985); border-color:var(--accent);}
+  #tapPad small{display:block; font-size:.65rem; color:var(--muted); letter-spacing:.05em; margin-top:4px;}
+  #feedback{height:1.6em; font-size:1.15rem; font-weight:800; letter-spacing:.1em;}
+  #feedback.PARFAIT{color:var(--good);} #feedback.BIEN{color:var(--accent2);}
+  #feedback.OK{color:var(--ok);} #feedback.RATÉ{color:var(--bad);}
+  .gauge{width:100%; display:flex; align-items:center; gap:10px; font-size:.8rem; color:var(--muted);}
+  .bar{flex:1; height:8px; background:var(--panel2); border-radius:4px; overflow:hidden;}
+  #accBar{height:100%; width:0%; background:linear-gradient(90deg,var(--bad),var(--ok),var(--good)); transition:width .2s;}
+  #accPct{min-width:3ch; text-align:right; font-variant-numeric:tabular-nums;}
+
+  /* Looper & boutique */
+  #looperStatus{font-size:.9rem; color:var(--muted); margin-bottom:10px;}
+  #looperStatus.active{color:var(--ink);}
+  button.action{
+    width:100%; padding:12px; font-size:.95rem; font-weight:600; border-radius:10px;
+    border:2px solid var(--accent); background:transparent; color:var(--ink); cursor:pointer;
+  }
+  button.action:hover:not(:disabled){background:rgba(255,93,162,.12);}
+  button.action:disabled{opacity:.35; cursor:default;}
+  #buyBpm{border-color:var(--gold);}
+  #buyBpm:hover:not(:disabled){background:rgba(255,209,102,.1);}
+  footer{max-width:640px; padding:0 20px 30px; color:var(--muted); font-size:.75rem; line-height:1.5;}
+
+  /* Overlay démarrage */
+  #overlay{
+    position:fixed; inset:0; background:rgba(14,12,20,.96); z-index:10;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:20px; text-align:center;
+  }
+  #overlay h1{font-size:2rem;}
+  #startBtn{
+    padding:16px 42px; font-size:1.1rem; font-weight:700; border-radius:12px;
+    border:none; background:var(--accent); color:#fff; cursor:pointer;
+  }
+  #overlay p{color:var(--muted); max-width:400px; font-size:.9rem; line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div id="overlay">
+  <h1>🍬 Sugar Box</h1>
+  <p>Active des pas sur la grille, puis <b>frappe en rythme</b> (espace ou le gros bouton)
+  quand la tête de lecture traverse un pas actif. Bien jouer rapporte des sucres.
+  Quand ta précision est bonne, <b>transforme le pattern en looper</b> : il jouera tout seul,
+  à la qualité que tu avais au moment du bind.</p>
+  <button id="startBtn">▶ Démarrer</button>
+</div>
+
+<header>
+  <h1>Sugar Box <span class="tag">PROTO v0.1</span></h1>
+  <div class="stats">
+    <span>🍬 <b id="cash">0</b></span>
+    <span class="passive">+<span id="passive">0</span>/s</span>
+    <span><span id="bpmLabel">90</span> BPM</span>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div id="grid"></div>
+    <p class="hint">Clique sur les cases pour composer ton pattern (les points marquent les temps).</p>
+  </section>
+
+  <section id="pad">
+    <button id="tapPad">FRAPPE<small>[ESPACE]</small></button>
+    <div id="feedback"></div>
+    <div class="gauge">Précision récente
+      <div class="bar"><div id="accBar"></div></div>
+      <span id="accPct">–</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Looper</h2>
+    <div id="looperStatus">Vide — enchaîne au moins 8 frappes, puis bind ton pattern.</div>
+    <button class="action" id="bindBtn" disabled>⟳ Transformer en looper</button>
+  </section>
+
+  <section>
+    <h2>Boutique</h2>
+    <button class="action" id="buyBpm">+10 BPM — <span id="bpmCost">200</span> 🍬</button>
+    <p class="hint">Plus de BPM = plus de revenu… mais la fenêtre de précision se resserre.</p>
+  </section>
+</main>
+
+<footer>
+  Boucle testée : frappe manuelle → sucres → bind en looper (revenu passif = qualité du bind ×
+  pas actifs × BPM) → achat BPM → retour à la frappe. Re-bind quand tu veux pour améliorer la
+  qualité gelée du looper.
+</footer>
+
+<script>
+'use strict';
+
+// ---------- État ----------
+const NUM_STEPS = 8;
+const pattern = [true,false,false,false,true,false,false,false]; // temps 1 et 3 par défaut
+let bpm = 90;
+let cash = 0;
+let bpmCost = 200;
+const BPM_MAX = 180;
+
+let audio = null;
+let noiseBuf = null;
+let nextStepTime = 0;
+let currentStep = 0;
+let playheadStep = -1;
+
+// pas actifs planifiés récemment/à venir : {time, step, taken}
+const activeStepTimes = [];
+// file des pas planifiés pour l'affichage de la tête de lecture : {time, step}
+const drawQueue = [];
+
+const recentScores = [];       // 8 dernières frappes, valeurs 0..1
+const BIND_MIN_HITS = 8;
+
+let looper = null;             // {quality, pattern:[...]} — qualité gelée au bind
+let passivePerSec = 0;
+
+const LOOKAHEAD_MS = 25;
+const SCHEDULE_AHEAD = 0.2;    // s
+
+// Valeurs économiques
+const HIT_BASE = 5;            // sucres pour une frappe "OK"
+const LOOPER_RATIO = 0.6;      // le looper rapporte 60% d'une frappe équivalente
+
+// ---------- DOM ----------
+const $ = id => document.getElementById(id);
+const gridEl = $('grid'), cashEl = $('cash'), passiveEl = $('passive'),
+      bpmLabelEl = $('bpmLabel'), feedbackEl = $('feedback'),
+      accBarEl = $('accBar'), accPctEl = $('accPct'),
+      bindBtn = $('bindBtn'), looperStatusEl = $('looperStatus'),
+      buyBpmBtn = $('buyBpm'), bpmCostEl = $('bpmCost');
+
+const stepCells = [];
+for (let i = 0; i < NUM_STEPS; i++) {
+  const cell = document.createElement('div');
+  cell.className = 'step' + (pattern[i] ? ' on' : '') + (i % 2 === 0 ? ' beat' : '');
+  cell.addEventListener('pointerdown', () => {
+    pattern[i] = !pattern[i];
+    cell.classList.toggle('on', pattern[i]);
+    updateBindBtn();
+  });
+  gridEl.appendChild(cell);
+  stepCells.push(cell);
+}
+
+// ---------- Audio ----------
+function initAudio() {
+  audio = new (window.AudioContext || window.webkitAudioContext)();
+  const len = Math.floor(audio.sampleRate * 0.2);
+  noiseBuf = audio.createBuffer(1, len, audio.sampleRate);
+  const data = noiseBuf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+}
+
+// Clap : 3 courtes bouffées de bruit filtré
+function clap(t, gain) {
+  for (let i = 0; i < 3; i++) {
+    const t0 = t + i * 0.012;
+    const src = audio.createBufferSource();
+    src.buffer = noiseBuf;
+    const f = audio.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 1800; f.Q.value = 0.9;
+    const g = audio.createGain();
+    const last = i === 2;
+    g.gain.setValueAtTime(gain * (last ? 0.8 : 0.45), t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + (last ? 0.16 : 0.03));
+    src.connect(f); f.connect(g); g.connect(audio.destination);
+    src.start(t0); src.stop(t0 + 0.2);
+  }
+}
+
+// Métronome discret sur les temps
+function tick(t, accent) {
+  const o = audio.createOscillator();
+  const g = audio.createGain();
+  o.frequency.value = accent ? 1600 : 1100;
+  g.gain.setValueAtTime(accent ? 0.10 : 0.05, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+  o.connect(g); g.connect(audio.destination);
+  o.start(t); o.stop(t + 0.05);
+}
+
+// ---------- Séquenceur (horloge audio + lookahead) ----------
+function stepDur() { return 60 / bpm / 2; } // croches : 8 pas = 1 mesure de 4 temps
+
+function scheduler() {
+  while (nextStepTime < audio.currentTime + SCHEDULE_AHEAD) {
+    scheduleStep(currentStep, nextStepTime);
+    nextStepTime += stepDur();
+    currentStep = (currentStep + 1) % NUM_STEPS;
+  }
+  // purge des pas trop anciens
+  const cutoff = audio.currentTime - 0.5;
+  while (activeStepTimes.length && activeStepTimes[0].time < cutoff) activeStepTimes.shift();
+}
+
+function scheduleStep(step, t) {
+  if (step % 2 === 0) tick(t, step === 0);
+  if (pattern[step]) activeStepTimes.push({ time: t, step, taken: false });
+  if (looper && looper.pattern[step]) {
+    clap(t, 0.45);
+    cash += HIT_BASE * LOOPER_RATIO * looper.quality;
+  }
+  drawQueue.push({ time: t, step });
+}
+
+// ---------- Frappe manuelle ----------
+const WINDOWS = [                     // fenêtres de précision (secondes)
+  { d: 0.045, score: 1.0, mult: 3, label: 'PARFAIT' },
+  { d: 0.090, score: 0.7, mult: 2, label: 'BIEN' },
+  { d: 0.160, score: 0.4, mult: 1, label: 'OK' },
+];
+
+function tap() {
+  if (!audio) return;
+  if (!pattern.some(Boolean)) { showFeedback('RATÉ', 'Active des pas !'); return; }
+  const t = audio.currentTime;
+
+  let best = null, bestD = Infinity;
+  for (const s of activeStepTimes) {
+    if (s.taken) continue;
+    const d = Math.abs(t - s.time);
+    if (d < bestD) { bestD = d; best = s; }
+  }
+
+  let win = null;
+  if (best) for (const w of WINDOWS) { if (bestD <= w.d) { win = w; break; } }
+
+  if (win) {
+    best.taken = true;
+    clap(t, 1);
+    flashCell(best.step);
+    cash += HIT_BASE * win.mult * (bpm / 90);
+    pushScore(win.score);
+    showFeedback(win.label);
+  } else {
+    clap(t, 0.25);
+    pushScore(0);
+    showFeedback('RATÉ');
+  }
+  updateBindBtn();
+}
+
+function pushScore(s) {
+  recentScores.push(s);
+  if (recentScores.length > BIND_MIN_HITS) recentScores.shift();
+}
+
+function accuracy() {
+  if (!recentScores.length) return 0;
+  return recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
+}
+
+let feedbackTimer = null;
+function showFeedback(label, txt) {
+  feedbackEl.textContent = txt || label;
+  feedbackEl.className = label;
+  clearTimeout(feedbackTimer);
+  feedbackTimer = setTimeout(() => { feedbackEl.textContent = ''; }, 700);
+}
+
+function flashCell(step) {
+  const c = stepCells[step];
+  c.classList.add('hitflash');
+  setTimeout(() => c.classList.remove('hitflash'), 120);
+}
+
+// ---------- Looper ----------
+function bind() {
+  if (recentScores.length < BIND_MIN_HITS || !pattern.some(Boolean)) return;
+  looper = { quality: accuracy(), pattern: pattern.slice() };
+  updateLooperUI();
+}
+
+function updateLooperUI() {
+  if (!looper) return;
+  const active = looper.pattern.filter(Boolean).length;
+  // fréquence d'un pas donné : une fois par mesure ; mesure = 240/bpm s
+  passivePerSec = HIT_BASE * LOOPER_RATIO * looper.quality * active * (bpm / 240);
+  looperStatusEl.classList.add('active');
+  looperStatusEl.innerHTML =
+    `Looper actif — qualité du bind <b>${Math.round(looper.quality * 100)}%</b> · ` +
+    `${active} pas · +${passivePerSec.toFixed(1)} 🍬/s`;
+  bindBtn.textContent = '⟳ Re-bind (remplace la qualité gelée)';
+}
+
+function updateBindBtn() {
+  bindBtn.disabled = recentScores.length < BIND_MIN_HITS || !pattern.some(Boolean);
+}
+
+// ---------- Boutique ----------
+buyBpmBtn.addEventListener('click', () => {
+  if (cash < bpmCost || bpm >= BPM_MAX) return;
+  cash -= bpmCost;
+  bpm += 10;
+  bpmCost = Math.round(bpmCost * 1.6);
+  bpmLabelEl.textContent = bpm;
+  if (bpm >= BPM_MAX) { buyBpmBtn.disabled = true; buyBpmBtn.textContent = 'BPM max atteint'; }
+  else bpmCostEl.textContent = bpmCost;
+  if (looper) updateLooperUI(); // le débit du looper suit le BPM
+});
+
+// ---------- Boucle d'affichage ----------
+function draw() {
+  if (audio) {
+    const now = audio.currentTime;
+    while (drawQueue.length && drawQueue[0].time <= now) {
+      playheadStep = drawQueue.shift().step;
+    }
+    stepCells.forEach((c, i) => c.classList.toggle('playhead', i === playheadStep));
+
+    cashEl.textContent = Math.floor(cash);
+    passiveEl.textContent = looper ? passivePerSec.toFixed(1) : '0';
+    const acc = accuracy();
+    accBarEl.style.width = (acc * 100) + '%';
+    accPctEl.textContent = recentScores.length ? Math.round(acc * 100) + '%' : '–';
+    buyBpmBtn.disabled = bpm >= BPM_MAX || cash < bpmCost;
+  }
+  requestAnimationFrame(draw);
+}
+
+// ---------- Entrées ----------
+$('tapPad').addEventListener('pointerdown', e => { e.preventDefault(); tap(); });
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !e.repeat) { e.preventDefault(); tap(); }
+});
+bindBtn.addEventListener('click', bind);
+
+// ---------- Démarrage ----------
+$('startBtn').addEventListener('click', () => {
+  initAudio();
+  nextStepTime = audio.currentTime + 0.1;
+  currentStep = 0;
+  setInterval(scheduler, LOOKAHEAD_MS);
+  requestAnimationFrame(draw);
+  document.getElementById('overlay').remove();
+});
+</script>
+</body>
+</html>
