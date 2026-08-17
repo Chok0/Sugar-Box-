@@ -120,7 +120,7 @@
   <h1>🍬 Sugar Box</h1>
   <p>Chaque <b>Sugar Cube</b> = 1 son = 1 couleur = 1 pad de frappe (touches 1-4).
   Les pas de la grille prennent la couleur du cube à frapper : frappe le <b>bon cube au bon
-  moment</b> pour scorer et monter le combo (jusqu'à ×4). Tout clic rapporte au moins 1 🍬,
+  moment</b> pour scorer et monter le combo (jusqu'à ×6). Tout clic rapporte au moins 1 🍬,
   mais un clic raté (ou le mauvais cube) casse le combo. Achète de nouveaux cubes pour débloquer
   des rythmes multi-couleurs plus riches — et binde-les en looper pour du revenu passif.</p>
   <button id="startBtn">▶ Démarrer</button>
@@ -181,7 +181,7 @@ const LOOPER_RATIO = 0.6;
 const BPM_START = 60, BPM_MAX = 180;
 const BIND_MIN_HITS = 8;
 const DRONE_MULT = 1.25;
-const COMBO_STEP = 0.5, COMBO_CAP = 6;
+const COMBO_STEP = 0.5, COMBO_CAP = 10; // combo max ×6
 const SAVE_KEY = 'sugarbox-save-v4';
 
 // 1 cube = 1 son = 1 couleur = 1 pad
@@ -273,12 +273,21 @@ function playCube(c, t, gain) {
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
     o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.1);
   } else if (kind === 'kick') {
+    // corps : chute de hauteur qui reste audible sur petits haut-parleurs
     const o = audio.createOscillator(), g = audio.createGain();
-    o.frequency.setValueAtTime(140, t);
-    o.frequency.exponentialRampToValueAtTime(46, t + 0.12);
-    g.gain.setValueAtTime(gain * 0.9, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
-    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.3);
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(55, t + 0.10);
+    g.gain.setValueAtTime(gain * 1.1, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.30);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.32);
+    // attaque : clic de batte
+    const src = audio.createBufferSource(); src.buffer = noiseBuf;
+    const f = audio.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 3000; f.Q.value = 0.7;
+    const g2 = audio.createGain();
+    g2.gain.setValueAtTime(gain * 0.5, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+    src.connect(f); f.connect(g2); g2.connect(audio.destination);
+    src.start(t); src.stop(t + 0.03);
   } else if (kind === 'hat') {
     const src = audio.createBufferSource(); src.buffer = noiseBuf;
     const f = audio.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6500;
@@ -372,10 +381,12 @@ function scheduleStep(abs, t) {
 }
 
 // ---------- Frappe manuelle ----------
+// Courbe des gains : le jeu précis doit écraser le spam (~1 🍬/clic).
+// gain = 5 × précision × combo × (BPM/60) × drone → jusqu'à 150 🍬/frappe.
 const WINDOWS = [
-  { d: 0.045, score: 1.0, mult: 3, label: 'PARFAIT', combo: 'up' },
-  { d: 0.090, score: 0.7, mult: 2, label: 'BIEN',    combo: 'up' },
-  { d: 0.160, score: 0.4, mult: 1, label: 'OK',      combo: 'keep' },
+  { d: 0.045, score: 1.0, mult: 5,   label: 'PARFAIT', combo: 'up' },
+  { d: 0.090, score: 0.7, mult: 2.5, label: 'BIEN',    combo: 'up' },
+  { d: 0.160, score: 0.4, mult: 1,   label: 'OK',      combo: 'keep' },
 ];
 const comboMult = () => 1 + Math.min(combo, COMBO_CAP) * COMBO_STEP;
 
