@@ -32,10 +32,10 @@ python3 -m http.server 8000
 
 | Paramètre | Valeur |
 |---|---|
-| Clic hors rythme | +1 🍬 fixe, remet le combo à zéro |
-| Fenêtres de précision | ±45 ms (parfait ×3), ±90 ms (bien ×2), ±160 ms (ok ×1, maintient le combo) |
-| Combo | +0.5 par frappe PARFAIT/BIEN, plafonné à ×4 |
-| Gain par frappe en rythme | 5 🍬 × précision × combo × (BPM/60) × drone |
+| Clic hors rythme (ou mauvais cube) | +1 🍬 fixe, remet le combo à zéro |
+| Fenêtres de précision | ±45 ms (parfait ×5), ±90 ms (bien ×2.5), ±160 ms (ok ×1, maintient le combo) |
+| Combo | +0.5 par frappe PARFAIT/BIEN, plafonné à ×6 |
+| Gain par frappe en rythme | 5 🍬 × précision × combo × (BPM/60) × drone — jusqu'à 150 🍬/frappe, ~12× le spam |
 | Rendement looper | 60 % d'une frappe équivalente (sans combo), pondéré par la qualité du bind |
 | Tempo de départ | 60 BPM |
 | Résolution | 1 pas = 1 croche ; 8 pas = 1 mesure |
